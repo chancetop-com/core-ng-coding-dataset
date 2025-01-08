@@ -1,0 +1,2 @@
+### Background
+Because CoreNG is not a well-known open-source framework and its documentation is limited, directly generating CoreNG-compatible java code using LLM would result in low accuracy. Therefore, we have constructed a dedicated coding dataset specifically for CoreNG.
