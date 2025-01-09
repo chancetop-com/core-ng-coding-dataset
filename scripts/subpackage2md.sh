@@ -26,12 +26,8 @@ echo "Here is the source code of $PACKAGE_NAME package $SUB_PACKAGE_NAME:"
 
 find "$SUB_PACKAGE_PATH" -name "*.java" | while read -r java_file; do
     filename=$(basename "$java_file")
-    
-    echo -e "\n$filename"
-    
+    echo -e "\n$filename" 
     echo '```java'
-    
     cat "$java_file"
-    
     echo '```'
 done

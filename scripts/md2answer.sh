@@ -14,7 +14,9 @@ if [ ! -f "$1" ]; then
 fi
 
 java_string=$(awk '{
+  gsub(/\\/, "\\\\");
   gsub(/"/, "\\\"");
+  gsub(/\\\\"/, "\\\\\\\"");
   gsub(/\r/, "");
   if (NR > 1) printf "\\n";
   printf "%s", $0;
