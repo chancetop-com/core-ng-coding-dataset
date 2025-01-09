@@ -1,6 +1,8 @@
 #!/bin/bash
 # @author stephen
 
+# caution: pipe the output to a file, not copy from the console
+
 if [ -z "$1" ]; then
   echo "Usage: $0 <markdown-file>"
   exit 1
@@ -16,8 +18,6 @@ java_string=$(awk '{
   gsub(/\r/, "");
   if (NR > 1) printf "\\n";
   printf "%s", $0;
-} END {
-  if (NR > 0) printf "\\n";
 }' "$1")
 
-echo "\"$java_string\""
+echo -n "\"$java_string\""

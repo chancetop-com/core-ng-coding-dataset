@@ -47,3 +47,5 @@ coverage/
 /azure.properties
 .stylelintcache
 dist/
+
+/.out
