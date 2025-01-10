@@ -9,8 +9,8 @@ fi
 PROJECT_DIR="$1"
 SUB_PACKAGE_PATH="$2"
 
-PACKAGE_NAME=$(basename $(echo $SUB_PACKAGE_PATH | awk -F'/src/main/java' '{print $1}'))
-SUB_PACKAGE_NAME=$(echo $SUB_PACKAGE_PATH | awk -F'/src/main/java' '{print $2}' | sed 's#^/##' | tr '/' '.')
+PACKAGE_NAME=$(basename "$(echo "$SUB_PACKAGE_PATH" | awk -F'/src/main/java' '{print $1}')")
+SUB_PACKAGE_NAME=$(echo "$SUB_PACKAGE_PATH" | awk -F'/src/main/java' '{print $2}' | sed 's#^/##' | tr '/' '.')
 
 if [ ! -d "$PROJECT_DIR" ]; then
     echo "Error: Java project directory $PROJECT_DIR does not exist."

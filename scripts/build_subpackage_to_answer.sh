@@ -22,10 +22,10 @@ project_path="/mnt/d/wonder-core-ng-project"
 tmp="../.out/tmp.md"
 
 for package in "${packages[@]}"; do
-    bash subpackage2md.sh $project_path $package > $tmp
+    bash subpackage2md.sh $project_path "$package" > $tmp
     answer=$(bash md2answer.sh $tmp)
-    package_name=$(basename $(echo $package | awk -F'/src/main/java' '{print $1}'))
-    sub_package_name=$(basename $package)
+    package_name=$(basename "$(echo "$package" | awk -F'/src/main/java' '{print $1}')")
+    sub_package_name=$(basename "$package")
     query="The source code of $package_name package $sub_package_name."
     echo "{\"messages\": [{\"role\": \"system\", \"content\": \"You are a code agent that help user write java code and typescript code with CoreNG/CoreFE framework.\"}, {\"role\": \"user\", \"content\": \"$query\"}, {\"role\": \"assistant\", \"content\": $answer}]}" >> ../train-source-code.jsonl
 done
