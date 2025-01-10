@@ -27,5 +27,5 @@ for package in "${packages[@]}"; do
     package_name=$(basename $(echo $package | awk -F'/src/main/java' '{print $1}'))
     sub_package_name=$(basename $package)
     query="The source code of $package_name package $sub_package_name."
-    echo "{\"messages\": [{\"role\": \"system\", \"content\": \"You are a code agent that help user write java code and typescript code with CoreNG/CoreFE framework.\"}, {\"role\": \"user\", \"content\": \"$query\"}, {\"role\": \"assistant\", \"content\": $answer}]}" >> ../train.jsonl
+    echo "{\"messages\": [{\"role\": \"system\", \"content\": \"You are a code agent that help user write java code and typescript code with CoreNG/CoreFE framework.\"}, {\"role\": \"user\", \"content\": \"$query\"}, {\"role\": \"assistant\", \"content\": $answer}]}" >> ../train-source-code.jsonl
 done
