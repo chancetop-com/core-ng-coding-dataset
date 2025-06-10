@@ -1,0 +1,204 @@
+import fire
+import litellm
+import os
+import json
+import textwrap
+from pathlib import Path
+from typing import List, Dict, Optional
+
+
+PROMPT_TEMPLATE = textwrap.dedent("""
+# ROLE:
+You are a Principal Software Engineer and a core architect of an internal Java framework named - core-ng. You have an encyclopedic knowledge of its internal workings, design patterns, and architectural rationale. You are creating a comprehensive knowledge base to train a new AI assistant.
+
+# CONTEXT:
+You will be provided with a `PRUNED_CONTEXT_BUNDLE`, which contains the API signatures and documentation of all relevant files for a specific framework module. You will also receive a `TARGET_FILE`, which is the one file you must focus on for this task. Your goal is to generate Q&A pairs specifically about the `TARGET_FILE`, using the `PRUNED_CONTEXT_BUNDLE` to understand its dependencies and interactions with other parts of the framework.
+
+# TASK:
+Analyze the `TARGET_FILE` within its full ecosystem context provided by the `PRUNED_CONTEXT_BUNDLE`. Generate a list of **3 to 5** insightful, diverse question-and-answer pairs that illuminate the inner workings of the `TARGET_FILE`.
+
+# CRITERIA FOR EACH PAIR:
+- The **Question** must be a deep, specific query about the `TARGET_FILE`'s logic, design choices, or its interaction with dependencies. It should probe the "why" or "how" behind the code.
+- The **Answer** must be authoritative and clear. It should leverage information from the `PRUNED_CONTEXT_BUNDLE` to explain how the `TARGET_FILE` collaborates with other classes and what the purpose of these interactions is.
+- The generated pairs must cover different aspects (e.g., a specific method's algorithm, class-level design, error handling strategy).
+
+# ===============================================
+# INPUTS
+# ===============================================
+
+## PRUNED_CONTEXT_BUNDLE:
+(Contains API signatures & docstrings of all dependency files in the module)
+{{PRUNED_CONTEXT_BUNDLE}}
+
+## TARGET_FILE_NAME:
+(The name of the file to focus on)
+{{TARGET_FILE_NAME}}
+
+## TARGET_FILE_CONTENT:
+(The full, original source code of the file to focus on)
+{{TARGET_FILE_CONTENT}}
+
+# ===============================================
+# OUTPUT FORMAT
+# ===============================================
+You MUST provide the output in a single, valid JSON block. The root element must be a JSON array of objects.
+
+[
+  {
+    "query": "In `{{TARGET_FILE_NAME}}`, why is the `someMethod` designed to be asynchronous by returning a CompletableFuture, and how does it interact with the `SomeDependencyService` seen in the context bundle?",
+    "response": "The `someMethod` is designed to be asynchronous to prevent blocking the main thread during I/O-intensive operations, a key design principle in our framework for high-throughput services. It interacts with `SomeDependencyService.executeAsync()` (whose signature you can see in the provided context) which is the designated non-blocking client for that external system. This ensures end-to-end reactivity."
+  },
+  {
+    "query": "...",
+    "response": "..."
+  }
+]
+""")
+
+LITELLM_MODEL = os.environ.get("LITELLM_MODEL", "gemini/gemini-pro")
+
+def generate_qa_pairs(target_file_name: str, target_file_content: str, pruned_context_bundle: str) -> Optional[str]:
+    """
+    Generates Q&A pairs for a target file using an LLM.
+
+    Args:
+        target_file_name: The name of the file to generate Q&A for.
+        target_file_content: The full source code of the target file.
+        pruned_context_bundle: A string containing the source code of dependency files.
+
+    Returns:
+        A string containing a JSON array of Q&A pairs, or None if an error occurs.
+    """
+    print(f"    - Generating Q&A with model: {LITELLM_MODEL}")
+    prompt = PROMPT_TEMPLATE.format(
+        PRUNED_CONTEXT_BUNDLE=pruned_context_bundle,
+        TARGET_FILE_NAME=target_file_name,
+        TARGET_FILE_CONTENT=target_file_content,
+    )
+
+    try:
+        response = litellm.completion(
+            model=LITELLM_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1,  # Lower temperature for more factual, less creative output
+        )
+
+        # Extract the text content from the response
+        content = response.choices[0].message.content
+
+        # Clean the response: LLMs sometimes wrap JSON in markdown fences (```json ... ```)
+        if content.strip().startswith("```json"):
+            content = content.strip()[7:-3].strip()
+        elif content.strip().startswith("```"):
+            content = content.strip()[3:-3].strip()
+
+        # Validate that the content is valid JSON
+        json.loads(content)
+        return content
+
+    except json.JSONDecodeError as e:
+        print(f"    !! ERROR: LLM returned invalid JSON. {e}")
+        print(f"    -- Raw Response --\n{content}\n--------------------")
+        return None
+    except Exception as e:
+        print(f"    !! ERROR: An exception occurred during the litellm API call: {e}")
+        return None
+
+
+def build_pruned_context_bundle(repo_path: str, target_file_path: str) -> str:
+    """
+    Build a pruned context bundle from the repository for the target file.
+
+    NOTE: A truly "pruned" bundle requires static analysis of the Java AST to
+    find exact dependencies. This is a complex task. For this implementation,
+    we use a practical heuristic: we assume that the most relevant dependencies
+    are the other `.java` files located in the same directory.
+
+    Args:
+        repo_path: The root path of the repository.
+        target_file_path: The absolute path to the target .java file.
+
+    Returns:
+        A single string containing the concatenated contents of sibling Java files.
+    """
+    pass
+
+
+def file2qa(repo_path: str, target_file_path: str) -> None:
+    """
+    Orchestrates the Q&A generation process for a single Java file.
+    It builds the context, generates the Q&A, and saves it to a .json file.
+
+    Args:
+        repo_path: The root path of the repository.
+        target_file_path: The absolute path to the target .java file.
+    """
+    target_path_obj = Path(target_file_path)
+    output_path = target_path_obj.with_suffix(".java.json")
+
+    if output_path.exists():
+        print(f"  - Skipping, output file already exists: {output_path.name}")
+        return
+
+    try:
+        # 1. Read the target file content
+        target_file_content = target_path_obj.read_text(encoding="utf-8")
+
+        # 2. Build the context bundle from sibling files
+        print("  - Building context bundle...")
+        pruned_context_bundle = build_pruned_context_bundle(repo_path, target_file_path)
+
+        # 3. Generate Q&A pairs
+        qa_json_str = generate_qa_pairs(
+            target_file_name=target_path_obj.name,
+            target_file_content=target_file_content,
+            pruned_context_bundle=pruned_context_bundle,
+        )
+
+        # 4. Save the result to a file
+        if qa_json_str:
+            output_path.write_text(qa_json_str, encoding="utf-8")
+            print(f"  - SUCCESS: Saved Q&A to {output_path.name}")
+        else:
+            print("  - FAILED: No Q&A data was generated.")
+
+    except FileNotFoundError:
+        print(f"!! ERROR: Target file not found at {target_file_path}")
+    except Exception as e:
+        print(f"!! ERROR: An unexpected error occurred while processing {target_path_obj.name}: {e}")
+
+
+def repo2qa(repo_path: str) -> None:
+    """
+    Traverses a repository, finds all .java files, and generates Q&A pairs for each.
+
+    Args:
+        repo_path: The path to the local git repository.
+    """
+    print(f"Starting Q&A generation for repository: {repo_path}")
+    print("=" * 60)
+
+    repo_path_obj = Path(repo_path)
+    if not repo_path_obj.is_dir():
+        print(f"Error: Provided path '{repo_path}' is not a valid directory.")
+        return
+
+    java_files = list(repo_path_obj.rglob("*.java"))
+    total_files = len(java_files)
+    print(f"Found {total_files} .java files to process.\n")
+
+    for i, file_path in enumerate(java_files):
+        relative_path = file_path.relative_to(repo_path_obj)
+        print(f"[{i + 1}/{total_files}] Processing: {relative_path}")
+        try:
+            file2qa(repo_path, str(file_path))
+        except Exception as e:
+            print(f"  !! FATAL ERROR in file2qa for {relative_path}: {e}")
+        print("-" * 40)
+
+    print("\n" + "=" * 60)
+    print("Repository processing complete.")
+
+
+if __name__ == "__main__":
+    fire.Fire(repo2qa)

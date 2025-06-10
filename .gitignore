@@ -49,3 +49,5 @@ coverage/
 dist/
 
 /.out
+
+**/__pycache__/**

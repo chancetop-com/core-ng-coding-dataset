@@ -3,24 +3,14 @@ import fire
 import litellm
 from tqdm import tqdm
 from typing import Tuple
-
-try:
-    from gitignore_parser import parse_gitignore
-except ImportError:
-    print("Warning: 'gitignore-parser' not found. To use .gitignore files, please install it:")
-    print("pip install gitignore-parser")
-    parse_gitignore = None
+from gitignore import GitignoreMatcher
 
 # Suppress litellm's informational messages for a cleaner output
 litellm.suppress_prompt_logging = True
 
 def count_tokens_and_cost(
     repo_path: str,
-    model: str = "gpt-4o",
-    default_skip_dirs: Tuple[str, ...] = (
-        '.git', '.venv', 'venv', 'env', 'node_modules', '__pycache__',
-        'dist', 'build', '.vscode', '.idea', 'target', 'coverage'
-    )
+    model: str = "gpt-4o"
 ):
     """
     Calculates tokens and estimates input cost for a repository.
@@ -34,8 +24,8 @@ def count_tokens_and_cost(
         return
 
     abs_repo_path = os.path.abspath(repo_path)
-    print(f"🔍 Analyzing repository: {abs_repo_path}")
-    print(f"   - Model for count & cost: {model}")
+    print(f"🔍Analyzing repository: {abs_repo_path}")
+    print(f"  - Model for count & cost: {model}")
 
     files_to_process = []
     code_extensions = {
@@ -45,39 +35,12 @@ def count_tokens_and_cost(
         '.md', '.toml', '.dockerfile'
     }
 
-    gitignore_path = os.path.join(abs_repo_path, '.gitignore')
-    use_gitignore = os.path.exists(gitignore_path) and parse_gitignore
+    matcher = GitignoreMatcher(abs_repo_path)
 
-    if use_gitignore:
-        print(f"   - Using exclusion rules from: .gitignore")
-        matcher = parse_gitignore(gitignore_path, base_dir=abs_repo_path)
-    else:
-        if not parse_gitignore and os.path.exists(gitignore_path):
-            print("   - Warning: Found .gitignore but 'gitignore-parser' is not installed. Falling back to defaults.")
-        else:
-            print(f"   - .gitignore not found. Using default skip list.")
-        print(f"   - Skipping directories: {list(default_skip_dirs)}")
-
-    for root, dirs, files in os.walk(abs_repo_path, topdown=True):
-        if '.git' in dirs:
-            dirs.remove('.git')
-
-        # Apply exclusion rules
-        if use_gitignore:
-            # Prune directories based on .gitignore rules for efficiency
-            dirs[:] = [d for d in dirs if not matcher(os.path.join(root, d))]
-
-            for file in files:
-                file_path = os.path.join(root, file)
-                if not matcher(file_path) and os.path.splitext(file)[1] in code_extensions:
-                    files_to_process.append(file_path)
-        else:
-            # Fallback: Prune directories based on the default list
-            dirs[:] = [d for d in dirs if d not in default_skip_dirs]
-
-            for file in files:
-                if os.path.splitext(file)[1] in code_extensions:
-                    files_to_process.append(os.path.join(root, file))
+    for root, _, files in tqdm(matcher.walk(), desc="Scanning directories", unit="dir", ncols=100):
+        for file in files:
+            if os.path.splitext(file)[1] in code_extensions:
+                files_to_process.append(os.path.join(root, file))
 
     if not files_to_process:
         print("\n⚠️ No processable code files found in the specified path (after exclusions).")
