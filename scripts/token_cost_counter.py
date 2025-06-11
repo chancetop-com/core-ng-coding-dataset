@@ -8,7 +8,7 @@ from gitignore import GitignoreMatcher
 # Suppress litellm's informational messages for a cleaner output
 litellm.suppress_prompt_logging = True
 
-def count_tokens_and_cost(
+def count_repo_tokens(
     repo_path: str,
     model: str = "gpt-4o"
 ):
@@ -76,5 +76,36 @@ def count_tokens_and_cost(
         print(f"⚠️ Could not calculate cost for model '{model}'. It may not be in litellm's pricing data.")
     print("="*50)
 
+def count_stdin_tokens(
+    model: str = "gpt-4o"
+) -> Tuple[int, float]:
+    """
+    Count tokens and estimate cost from standard input.
+    
+    :param model: The model for token counting and cost estimation.
+    :return: Tuple of (total_tokens, estimated_cost)
+    """
+    import sys
+    if sys.stdin.isatty():
+        print("Error: No input provided via stdin")
+        return (0, 0.0)
+        
+    input_text = sys.stdin.read()
+    total_tokens = litellm.token_counter(model=model, text=input_text)
+    
+    estimated_cost = 0.0
+    try:
+        model_info = litellm.get_model_info(model=model)
+        input_cost_per_token = model_info.get('input_cost_per_token', 0.0)
+        if input_cost_per_token > 0:
+            estimated_cost = total_tokens * input_cost_per_token
+    except Exception as e:
+        print(f"\nDEBUG: An error occurred during cost calculation: {e}")
+    
+    print(f"Tokens: {total_tokens}, Cost: {estimated_cost}")
+
 if __name__ == "__main__":
-    fire.Fire(count_tokens_and_cost)
+    fire.Fire({
+        'repo': count_repo_tokens,
+        'stdin': count_stdin_tokens
+    })

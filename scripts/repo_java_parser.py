@@ -37,6 +37,7 @@ class JavaParseResult:
 
 class JavaParser:
     def __init__(self):
+        self.result = None
         self.parser = Parser(Language(tsj.language()))
 
     def parse(self, path: str) -> JavaParseResult:

@@ -3,8 +3,9 @@ import litellm
 import os
 import json
 import textwrap
+import subprocess
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import Optional
 
 
 PROMPT_TEMPLATE = textwrap.dedent("""
@@ -28,15 +29,15 @@ Analyze the `TARGET_FILE` within its full ecosystem context provided by the `PRU
 
 ## PRUNED_CONTEXT_BUNDLE:
 (Contains API signatures & docstrings of all dependency files in the module)
-{{PRUNED_CONTEXT_BUNDLE}}
+{PRUNED_CONTEXT_BUNDLE}
 
 ## TARGET_FILE_NAME:
 (The name of the file to focus on)
-{{TARGET_FILE_NAME}}
+{TARGET_FILE_NAME}
 
 ## TARGET_FILE_CONTENT:
 (The full, original source code of the file to focus on)
-{{TARGET_FILE_CONTENT}}
+{TARGET_FILE_CONTENT}
 
 # ===============================================
 # OUTPUT FORMAT
@@ -44,18 +45,18 @@ Analyze the `TARGET_FILE` within its full ecosystem context provided by the `PRU
 You MUST provide the output in a single, valid JSON block. The root element must be a JSON array of objects.
 
 [
-  {
-    "query": "In `{{TARGET_FILE_NAME}}`, why is the `someMethod` designed to be asynchronous by returning a CompletableFuture, and how does it interact with the `SomeDependencyService` seen in the context bundle?",
+  {{
+    "query": "In `{TARGET_FILE_NAME}`, why is the `someMethod` designed to be asynchronous by returning a CompletableFuture, and how does it interact with the `SomeDependencyService` seen in the context bundle?",
     "response": "The `someMethod` is designed to be asynchronous to prevent blocking the main thread during I/O-intensive operations, a key design principle in our framework for high-throughput services. It interacts with `SomeDependencyService.executeAsync()` (whose signature you can see in the provided context) which is the designated non-blocking client for that external system. This ensures end-to-end reactivity."
-  },
-  {
+  }},
+  {{
     "query": "...",
     "response": "..."
-  }
+  }}
 ]
 """)
 
-LITELLM_MODEL = os.environ.get("LITELLM_MODEL", "gemini/gemini-pro")
+LITELLM_MODEL = "azure/gpt-4o"
 
 def generate_qa_pairs(target_file_name: str, target_file_content: str, pruned_context_bundle: str) -> Optional[str]:
     """
@@ -69,7 +70,7 @@ def generate_qa_pairs(target_file_name: str, target_file_content: str, pruned_co
     Returns:
         A string containing a JSON array of Q&A pairs, or None if an error occurs.
     """
-    print(f"    - Generating Q&A with model: {LITELLM_MODEL}")
+    print(f"  - Generating Q&A with model: {LITELLM_MODEL}")
     prompt = PROMPT_TEMPLATE.format(
         PRUNED_CONTEXT_BUNDLE=pruned_context_bundle,
         TARGET_FILE_NAME=target_file_name,
@@ -92,6 +93,7 @@ def generate_qa_pairs(target_file_name: str, target_file_content: str, pruned_co
         elif content.strip().startswith("```"):
             content = content.strip()[3:-3].strip()
 
+        print(response.get("usage", {}))
         # Validate that the content is valid JSON
         json.loads(content)
         return content
@@ -107,24 +109,58 @@ def generate_qa_pairs(target_file_name: str, target_file_content: str, pruned_co
 
 def build_pruned_context_bundle(repo_path: str, target_file_path: str) -> str:
     """
-    Build a pruned context bundle from the repository for the target file.
+    Build a pruned context bundle by calling an external Java parser script.
 
-    NOTE: A truly "pruned" bundle requires static analysis of the Java AST to
-    find exact dependencies. This is a complex task. For this implementation,
-    we use a practical heuristic: we assume that the most relevant dependencies
-    are the other `.java` files located in the same directory.
+    This function executes `repo_java_parser.py resolve` to perform static
+    analysis on the target Java file and get its relevant dependencies.
 
     Args:
         repo_path: The root path of the repository.
         target_file_path: The absolute path to the target .java file.
 
     Returns:
-        A single string containing the concatenated contents of sibling Java files.
+        A single string containing the concatenated context from the parser,
+        or an empty string if an error occurs.
     """
-    pass
+    try:
+        parser_script_path = Path(__file__).parent.resolve() / "repo_java_parser.py"
+        # Define the command to execute the external script
+        command = [
+            "python",
+            str(parser_script_path),
+            "resolve",
+            str(repo_path),
+            str(target_file_path)
+        ]
+
+        # Execute the command and capture the output
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=True,  # Raise an exception for non-zero exit codes
+            encoding='utf-8'
+        )
+        
+        # The standard output of the script is the context bundle
+        return result.stdout
+
+    except FileNotFoundError:
+        print(f"!! ERROR: The parser script 'repo_java_parser.py' was not found.")
+        print("!! Ensure the script is in your current directory or system's PATH.")
+        return ""
+    except subprocess.CalledProcessError as e:
+        # This error is raised when the script returns a non-zero exit code (i.e., it failed)
+        print(f"!! ERROR: The parser script failed while processing '{Path(target_file_path).name}'.")
+        print(f"   - Exit Code: {e.returncode}")
+        print(f"   - Stderr:\n{e.stderr}")
+        return ""
+    except Exception as e:
+        print(f"!! ERROR: An unexpected error occurred while building the context bundle for '{Path(target_file_path).name}': {e}")
+        return ""
 
 
-def file2qa(repo_path: str, target_file_path: str) -> None:
+def file2qa(repo_path: str, target_file_path: str, rst_path: str = "library-source-code-to-qa.jsonl") -> None:
     """
     Orchestrates the Q&A generation process for a single Java file.
     It builds the context, generates the Q&A, and saves it to a .json file.
@@ -132,13 +168,10 @@ def file2qa(repo_path: str, target_file_path: str) -> None:
     Args:
         repo_path: The root path of the repository.
         target_file_path: The absolute path to the target .java file.
+        rst_path: The path where the generated Q&A will be saved as a JSONL file.
     """
     target_path_obj = Path(target_file_path)
-    output_path = target_path_obj.with_suffix(".java.json")
-
-    if output_path.exists():
-        print(f"  - Skipping, output file already exists: {output_path.name}")
-        return
+    output_path = Path(rst_path)
 
     try:
         # 1. Read the target file content
@@ -157,7 +190,8 @@ def file2qa(repo_path: str, target_file_path: str) -> None:
 
         # 4. Save the result to a file
         if qa_json_str:
-            output_path.write_text(qa_json_str, encoding="utf-8")
+            with open(output_path, 'a', encoding="utf-8") as f:
+                f.write(qa_json_str + '\n')
             print(f"  - SUCCESS: Saved Q&A to {output_path.name}")
         else:
             print("  - FAILED: No Q&A data was generated.")
@@ -168,12 +202,9 @@ def file2qa(repo_path: str, target_file_path: str) -> None:
         print(f"!! ERROR: An unexpected error occurred while processing {target_path_obj.name}: {e}")
 
 
-def repo2qa(repo_path: str) -> None:
+def repo2qa(repo_path: str, rst_path = "library-source-code-to-qa.jsonl") -> None:
     """
     Traverses a repository, finds all .java files, and generates Q&A pairs for each.
-
-    Args:
-        repo_path: The path to the local git repository.
     """
     print(f"Starting Q&A generation for repository: {repo_path}")
     print("=" * 60)
@@ -191,7 +222,7 @@ def repo2qa(repo_path: str) -> None:
         relative_path = file_path.relative_to(repo_path_obj)
         print(f"[{i + 1}/{total_files}] Processing: {relative_path}")
         try:
-            file2qa(repo_path, str(file_path))
+            file2qa(repo_path, str(file_path), rst_path)
         except Exception as e:
             print(f"  !! FATAL ERROR in file2qa for {relative_path}: {e}")
         print("-" * 40)
@@ -201,4 +232,4 @@ def repo2qa(repo_path: str) -> None:
 
 
 if __name__ == "__main__":
-    fire.Fire(repo2qa)
+    fire.Fire(file2qa)
