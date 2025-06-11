@@ -1,0 +1,22 @@
+[
+  {
+    "query": "How does the `ExecutorImpl` class ensure that tasks are tracked and logged, especially in the context of shutdown scenarios?",
+    "response": "The `ExecutorImpl` class uses a `Set<String>` named `runningTasks` to track all currently running tasks. This set is crucial for logging purposes, particularly during shutdown scenarios. When the `shutdown` method is called, it locks the executor and cancels all delayed tasks using `scheduler.shutdownNow()`. If there are any tasks that fail to complete, they are logged with an error code `FAILED_TO_STOP` using the logger. This mechanism ensures that any incomplete tasks are properly tracked and logged, providing visibility into tasks that were interrupted due to shutdown."
+  },
+  {
+    "query": "What is the purpose of the `ReentrantLock` in the `ExecutorImpl` class, and how does it contribute to thread safety?",
+    "response": "The `ReentrantLock` in the `ExecutorImpl` class is used to ensure thread safety when modifying shared resources, such as the `scheduler` and `runningTasks`. It is particularly important in the `shutdown` and `submit` methods. In `shutdown`, the lock ensures that the shutdown process is not interrupted by other threads attempting to submit new tasks. In `submit`, the lock ensures that the scheduler is initialized only once and prevents race conditions when checking if the executor is shutting down. This use of `ReentrantLock` helps maintain the integrity of the executor's state in a multi-threaded environment."
+  },
+  {
+    "query": "How does the `ExecutorImpl` class handle task rejection, and what logging mechanism is used to inform about rejected tasks?",
+    "response": "The `ExecutorImpl` class handles task rejection primarily through the `RejectedExecutionException`. When a task is rejected, typically due to the executor being shut down, the exception is caught, and a warning is logged using the logger with the error code `TASK_REJECTED`. This logging mechanism provides detailed information about the rejected task, including the action name and the reason for rejection. Additionally, the `runningTasks` set is updated to remove the task that was rejected, ensuring that the tracking remains accurate."
+  },
+  {
+    "query": "What is the role of the `LogManager` in the `ExecutorImpl` class, and how does it facilitate logging for tasks?",
+    "response": "The `LogManager` in the `ExecutorImpl` class plays a crucial role in facilitating logging for tasks. It provides the `ID_GENERATOR` to generate unique action IDs for each task, ensuring traceability. The `CURRENT_ACTION_LOG` thread-local variable is used to associate tasks with their parent action logs, allowing for detailed logging of task execution. When creating an `ExecutorTask`, the `LogManager` is passed along to ensure that the task's execution context includes logging capabilities. This integration ensures that all tasks have comprehensive logging, aiding in monitoring and debugging."
+  },
+  {
+    "query": "How does the `ExecutorImpl` class manage delayed tasks, and what is the significance of the `DelayedTask` inner class?",
+    "response": "The `ExecutorImpl` class manages delayed tasks using a `ScheduledExecutorService` named `scheduler`. When a task is submitted with a delay, the `scheduleDelayedTask` method schedules it to run after the specified duration. The `DelayedTask` inner class is significant because it wraps the actual task execution logic, ensuring that the task is properly logged and tracked. The `DelayedTask` class implements `Callable<Void>` and overrides the `call` method to submit the task for execution. This design allows for delayed tasks to be handled seamlessly while maintaining the logging and tracking mechanisms provided by the `ExecutorImpl` class."
+  }
+]
