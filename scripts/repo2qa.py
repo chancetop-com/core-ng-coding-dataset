@@ -1,6 +1,7 @@
 import fire
 import litellm
 import json
+import os
 import textwrap
 import subprocess
 from pathlib import Path
@@ -176,11 +177,20 @@ def file2qa(repo_path: str, target_file_path: str, prompt_template: str = LIBRAR
     Args:
         repo_path: The root path of the repository.
         target_file_path: The absolute path to the target .java file.
-        rst_path: The path where the generated Q&A will be saved as a JSONL file.
+        rst_path: The path where the generated Q&A will be saved as a JSON file.
         prompt_template: The template used to format the prompt for the LLM.
     """
     target_path_obj = Path(target_file_path)
     output_path = Path(rst_path)
+
+    # Check if the file has already been processed
+    if os.path.exists(output_path):
+        with open(output_path, 'r', encoding="utf-8") as f:
+            existing_data = json.load(f)
+        processed_files = {entry.get("filename") for entry in existing_data}
+        if target_path_obj.name in processed_files:
+            print(f"  - SKIPPED: {target_path_obj.name} is already processed.")
+            return
 
     try:
         # 1. Read the target file content
@@ -200,8 +210,18 @@ def file2qa(repo_path: str, target_file_path: str, prompt_template: str = LIBRAR
 
         # 4. Save the result to a file
         if qa_json_str:
-            with open(output_path, 'a', encoding="utf-8") as f:
-                f.write(qa_json_str + '\n')
+            new_data = json.loads(qa_json_str)
+
+            # Add filename field to each entry
+            for entry in new_data:
+                entry["filename"] = target_path_obj.name
+
+            # Append new Q&A pairs to the existing data
+            existing_data.extend(new_data)
+
+            # Write the updated data back to the file
+            with open(output_path, 'w', encoding="utf-8") as f:
+                json.dump(existing_data, f, ensure_ascii=False, indent=2)
             print(f"  - SUCCESS: Saved Q&A to {output_path.name}")
         else:
             print("  - FAILED: No Q&A data was generated.")

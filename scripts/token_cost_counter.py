@@ -37,10 +37,7 @@ def count_repo_tokens(
 
     files_to_process = []
     code_extensions = {
-        '.py', '.js', '.ts', '.java', '.c', '.cpp', '.h', '.hpp', '.cs', '.go',
-        '.rs', '.php', '.rb', '.swift', '.kt', '.scala', '.m', '.sh', '.html',
-        '.css', '.scss', '.less', '.vue', '.jsx', '.tsx', '.json', '.yaml', '.yml',
-        '.md', '.toml', '.dockerfile'
+        '.java', '.kts', '.properties', 'Dockerfile', '.txt'
     }
 
     matcher = GitignoreMatcher(abs_repo_path)
