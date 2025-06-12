@@ -1,14 +1,14 @@
 import fire
 import litellm
-import os
 import json
 import textwrap
 import subprocess
 from pathlib import Path
 from typing import Optional
+from token_cost_counter import count_cost
 
 
-PROMPT_TEMPLATE = textwrap.dedent("""
+LIBRARY_SOURCE_CODE_TO_QA_PROMPT_TEMPLATE = textwrap.dedent("""
 # ROLE:
 You are a Principal Software Engineer and a core architect of an internal Java framework named - core-ng. You have an encyclopedic knowledge of its internal workings, design patterns, and architectural rationale. You are creating a comprehensive knowledge base to train a new AI assistant.
 
@@ -58,7 +58,7 @@ You MUST provide the output in a single, valid JSON block. The root element must
 
 LITELLM_MODEL = "azure/gpt-4o"
 
-def generate_qa_pairs(target_file_name: str, target_file_content: str, pruned_context_bundle: str) -> Optional[str]:
+def generate_qa_pairs(target_file_name: str, target_file_content: str, pruned_context_bundle: str, prompt_template: str = LIBRARY_SOURCE_CODE_TO_QA_PROMPT_TEMPLATE) -> Optional[str]:
     """
     Generates Q&A pairs for a target file using an LLM.
 
@@ -66,12 +66,13 @@ def generate_qa_pairs(target_file_name: str, target_file_content: str, pruned_co
         target_file_name: The name of the file to generate Q&A for.
         target_file_content: The full source code of the target file.
         pruned_context_bundle: A string containing the source code of dependency files.
+        prompt_template: The template used to format the prompt for the LLM.
 
     Returns:
         A string containing a JSON array of Q&A pairs, or None if an error occurs.
     """
     print(f"  - Generating Q&A with model: {LITELLM_MODEL}")
-    prompt = PROMPT_TEMPLATE.format(
+    prompt = prompt_template.format(
         PRUNED_CONTEXT_BUNDLE=pruned_context_bundle,
         TARGET_FILE_NAME=target_file_name,
         TARGET_FILE_CONTENT=target_file_content,
@@ -93,7 +94,14 @@ def generate_qa_pairs(target_file_name: str, target_file_content: str, pruned_co
         elif content.strip().startswith("```"):
             content = content.strip()[3:-3].strip()
 
-        print(response.get("usage", {}))
+        usage = response.get("usage")
+        completion_tokens = usage.get("completion_tokens", 0)
+        completion_cost = count_cost(completion_tokens, model=LITELLM_MODEL, token_type="input_cost_per_token")
+        prompt_tokens = usage.get("prompt_tokens", 0)
+        prompt_cost = count_cost(completion_tokens, model=LITELLM_MODEL, token_type="output_cost_per_token")
+        total_tokens = usage.get("total_tokens", 0)
+        total_cost = completion_cost + prompt_cost
+        print(f"  - Usage: {completion_tokens} completion tokens - cost: {completion_cost}, {prompt_tokens} prompt tokens - cost: {prompt_cost}, {total_tokens} total tokens - cost: {total_cost}")
         # Validate that the content is valid JSON
         json.loads(content)
         return content
@@ -160,7 +168,7 @@ def build_pruned_context_bundle(repo_path: str, target_file_path: str) -> str:
         return ""
 
 
-def file2qa(repo_path: str, target_file_path: str, rst_path: str = "library-source-code-to-qa.jsonl") -> None:
+def file2qa(repo_path: str, target_file_path: str, prompt_template: str = LIBRARY_SOURCE_CODE_TO_QA_PROMPT_TEMPLATE, rst_path: str = "library-source-code-to-qa.jsonl") -> None:
     """
     Orchestrates the Q&A generation process for a single Java file.
     It builds the context, generates the Q&A, and saves it to a .json file.
@@ -169,6 +177,7 @@ def file2qa(repo_path: str, target_file_path: str, rst_path: str = "library-sour
         repo_path: The root path of the repository.
         target_file_path: The absolute path to the target .java file.
         rst_path: The path where the generated Q&A will be saved as a JSONL file.
+        prompt_template: The template used to format the prompt for the LLM.
     """
     target_path_obj = Path(target_file_path)
     output_path = Path(rst_path)
@@ -186,6 +195,7 @@ def file2qa(repo_path: str, target_file_path: str, rst_path: str = "library-sour
             target_file_name=target_path_obj.name,
             target_file_content=target_file_content,
             pruned_context_bundle=pruned_context_bundle,
+            prompt_template=prompt_template
         )
 
         # 4. Save the result to a file
@@ -202,7 +212,7 @@ def file2qa(repo_path: str, target_file_path: str, rst_path: str = "library-sour
         print(f"!! ERROR: An unexpected error occurred while processing {target_path_obj.name}: {e}")
 
 
-def repo2qa(repo_path: str, rst_path = "library-source-code-to-qa.jsonl") -> None:
+def repo2qa(repo_path: str, prompt_template: str = LIBRARY_SOURCE_CODE_TO_QA_PROMPT_TEMPLATE, rst_path ="library-source-code-to-qa.jsonl") -> None:
     """
     Traverses a repository, finds all .java files, and generates Q&A pairs for each.
     """
@@ -222,7 +232,7 @@ def repo2qa(repo_path: str, rst_path = "library-source-code-to-qa.jsonl") -> Non
         relative_path = file_path.relative_to(repo_path_obj)
         print(f"[{i + 1}/{total_files}] Processing: {relative_path}")
         try:
-            file2qa(repo_path, str(file_path), rst_path)
+            file2qa(repo_path, str(file_path), prompt_template, rst_path)
         except Exception as e:
             print(f"  !! FATAL ERROR in file2qa for {relative_path}: {e}")
         print("-" * 40)
@@ -232,4 +242,7 @@ def repo2qa(repo_path: str, rst_path = "library-source-code-to-qa.jsonl") -> Non
 
 
 if __name__ == "__main__":
-    fire.Fire(file2qa)
+    fire.Fire({
+        "repo": repo2qa,
+        "file": file2qa
+    })

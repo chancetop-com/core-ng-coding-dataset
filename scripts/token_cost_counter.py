@@ -8,6 +8,15 @@ from gitignore import GitignoreMatcher
 # Suppress litellm's informational messages for a cleaner output
 litellm.suppress_prompt_logging = True
 
+def count_cost(total_tokens: int, model: str = "gpt-4o", token_type: str = "input_cost_per_token") -> float:
+    try:
+        model_info = litellm.get_model_info(model=model)
+        input_cost_per_token = model_info.get(token_type, 0.0)
+        if input_cost_per_token > 0:
+            return total_tokens * input_cost_per_token
+    except Exception as e:
+        print(f"\nDEBUG: An error occurred during cost calculation: {e}")
+
 def count_repo_tokens(
     repo_path: str,
     model: str = "gpt-4o"
@@ -17,7 +26,6 @@ def count_repo_tokens(
 
     :param repo_path: Path to the local code repository.
     :param model: The model for token counting and cost estimation.
-    :param default_skip_dirs: Fallback tuple of directories to skip if .gitignore is not present.
     """
     if not os.path.isdir(repo_path):
         print(f"❌ Error: The provided path '{repo_path}' is not a valid directory.")
@@ -57,14 +65,7 @@ def count_repo_tokens(
                 tqdm.write(f"❌ Failed to process file {file_path}: {e}")
             pbar.update(1)
 
-    estimated_cost = 0.0
-    try:
-        model_info = litellm.get_model_info(model=model)
-        input_cost_per_token = model_info.get('input_cost_per_token', 0.0)
-        if input_cost_per_token > 0:
-            estimated_cost = total_tokens * input_cost_per_token
-    except Exception as e:
-        print(f"\nDEBUG: An error occurred during cost calculation: {e}")
+    estimated_cost = count_cost(total_tokens, model=model)
 
     print("\n" + "="*50)
     print(f"✅ Analysis Complete!")
@@ -88,7 +89,7 @@ def count_stdin_tokens(
     import sys
     if sys.stdin.isatty():
         print("Error: No input provided via stdin")
-        return (0, 0.0)
+        return 0, 0.0
         
     input_text = sys.stdin.read()
     total_tokens = litellm.token_counter(model=model, text=input_text)
