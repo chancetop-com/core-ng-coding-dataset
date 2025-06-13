@@ -1,36 +1,22 @@
 [
   {
-    "query": "What is the best way to manage dependencies in a service class using our framework?",
-    "response": "The best practice is to use dependency injection to manage dependencies in a service class. This ensures that the service class remains decoupled from the instantiation logic of its dependencies, promoting better testability and maintainability. In `OrderPaymentService`, dependencies such as `Repository<OrderPayment>`, `PaymentWebService`, `MerchantPaymentGatewayWebService`, and `SquareOrderIntegrationWebService` are injected using the `@Inject` annotation. This allows the framework to handle the lifecycle and configuration of these dependencies, making the service class cleaner and more focused on business logic."
+    "query": "What is the best way to manage database entities using the core-ng framework?",
+    "response": "The recommended approach is to use the `Repository` interface provided by core-ng for CRUD operations on database entities. This ensures type safety, clear separation of concerns, and efficient database interactions. In the `OrderPaymentService` file, the `orderPaymentRepository` is injected and used for operations like `selectOne`, `update`, and `partialUpdate`. For example, the `getOrderPayment` method uses `selectOne` with a query parameter to fetch a single entity, and throws a `NotFoundException` if the entity is not found. This demonstrates clean and idiomatic usage of the repository pattern.",
+    "filename": "D:\\fbr-project\\backend\\order-service\\src\\main\\java\\app\\order\\service\\OrderPaymentService.java"
   },
   {
-    "query": "How should transaction management be handled in service methods?",
-    "response": "Transaction management should be handled by ensuring that all operations that need to be atomic are encapsulated within a single method, and by using the repository's update methods to persist changes. In `OrderPaymentService`, methods like `cancelOrderWithPayment` and `refundOrderWithPayment` encapsulate multiple operations that need to be executed as a single transaction. The method `updatedOrderPayment` is used to update the state of `OrderPayment` and ensure that changes are persisted correctly. This approach ensures that either all operations succeed or none do, maintaining data integrity."
+    "query": "How should conditional business logic be structured for readability and maintainability?",
+    "response": "The best practice is to use clear and concise conditional blocks that encapsulate specific business rules, avoiding deeply nested or overly complex logic. In the `OrderPaymentService` file, the `cancelOrderWithPayment` method demonstrates this principle by using sequential `if` statements to handle different payment statuses and channel types. Each condition is self-contained and maps directly to a specific business rule, making the code easy to read and maintain.",
+    "filename": "D:\\fbr-project\\backend\\order-service\\src\\main\\java\\app\\order\\service\\OrderPaymentService.java"
   },
   {
-    "query": "What is the recommended way to handle conditional logic based on domain-specific attributes?",
-    "response": "The best practice is to use clear and concise conditional statements that check domain-specific attributes and execute the appropriate business logic. In `OrderPaymentService`, the method `cancelOrderWithPayment` demonstrates this by checking various attributes of `Order` and `OrderPayment` such as `paymentStatus`, `channelType`, and `paymentMethodType` to determine the correct course of action. This approach ensures that the business logic is easy to understand and maintain, and that all possible conditions are handled appropriately."
+    "query": "What is the recommended way to handle external service integrations in core-ng applications?",
+    "response": "The best practice is to encapsulate external service calls within dedicated methods and use dependency injection to manage service clients. This ensures modularity, testability, and separation of concerns. In the `OrderPaymentService` file, external services like `PaymentWebService` and `SquareOrderIntegrationWebService` are injected and used within methods like `refund` and `isMerchantPaymentGatewayAvailable`. For example, the `refund` method constructs a `RefundPaymentRequest` object and calls the `paymentWebService.refund` method, encapsulating the integration logic within a single method for clarity and reusability.",
+    "filename": "D:\\fbr-project\\backend\\order-service\\src\\main\\java\\app\\order\\service\\OrderPaymentService.java"
   },
   {
-    "query": "How should exceptions be handled to provide meaningful error responses?",
-    "response": "Exceptions should be handled by throwing specific exceptions that correspond to particular error conditions and by using framework-provided exception classes for common error scenarios. In `OrderPaymentService`, the method `getOrderPayment` throws a `NotFoundException` if the order payment is not found, providing a clear and meaningful error response. Additionally, the method `refundOrderWithPayment` throws a `ConflictException` if the payment status is invalid, ensuring that the client receives a precise error message rather than a generic server error."
-  }
-]
-[
-  {
-    "query": "What is the best way to manage dependencies in a service class using our framework?",
-    "response": "The best practice is to use dependency injection to manage dependencies in a service class. This ensures that the service class remains decoupled from the creation of its dependencies, making the code more modular and easier to test. In `OrderPaymentService.java`, dependencies such as `Repository<OrderPayment>`, `PaymentWebService`, `MerchantPaymentGatewayWebService`, and `SquareOrderIntegrationWebService` are injected using the `@Inject` annotation. This allows the service to focus on its core logic without worrying about how these dependencies are instantiated."
-  },
-  {
-    "query": "How should transactions be handled when performing multiple related operations?",
-    "response": "The best practice is to ensure that all related operations are performed within a single transaction to maintain data consistency. In `OrderPaymentService.java`, methods like `cancelOrderWithPayment` and `refundOrderWithPayment` handle multiple operations related to order payments. These methods ensure that all changes are applied atomically, either by updating the payment status or refunding the amount, thereby maintaining consistency across the operations."
-  },
-  {
-    "query": "What is the recommended way to handle different payment statuses in a service class?",
-    "response": "The best practice is to use conditional logic to handle different payment statuses appropriately. This ensures that each status is processed according to the business rules. In `OrderPaymentService.java`, the method `cancelOrderWithPayment` uses conditional checks to handle various payment statuses such as `PENDING`, `VOIDED`, and `REFUNDED`. This method updates the payment status based on the current status and the type of order channel, ensuring that each status transition is handled correctly."
-  },
-  {
-    "query": "How can we ensure that our service methods are robust and handle edge cases effectively?",
-    "response": "The best practice is to include comprehensive checks and validations within service methods to handle edge cases and prevent errors. In `OrderPaymentService.java`, methods like `refundOrderWithPayment` and `cancelOrderWithPayment` include checks for payment status and refund amounts. For example, `refundOrderWithPayment` throws a `ConflictException` if the payment status is invalid, ensuring that the method handles edge cases and prevents inconsistent states."
+    "query": "How can state updates be handled efficiently in core-ng applications?",
+    "response": "The recommended approach is to create a new instance of the entity with updated fields and use the repository's `update` or `partialUpdate` methods to persist changes. This avoids mutating the original entity and ensures consistency. In the `OrderPaymentService` file, the `updatedOrderPayment` method creates a new `OrderPayment` instance, calculates updated fields like `refundedAmount` and `paymentStatus`, and returns the updated entity. This method is then used in various workflows, such as refunds and cancellations, ensuring efficient and consistent state updates.",
+    "filename": "D:\\fbr-project\\backend\\order-service\\src\\main\\java\\app\\order\\service\\OrderPaymentService.java"
   }
 ]

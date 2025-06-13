@@ -191,6 +191,8 @@ def file2qa(repo_path: str, target_file_path: str, prompt_template: str = LIBRAR
         if target_path_obj.name in processed_files:
             print(f"  - SKIPPED: {target_path_obj.name} is already processed.")
             return
+    else:
+        existing_data = []
 
     try:
         # 1. Read the target file content
@@ -202,7 +204,7 @@ def file2qa(repo_path: str, target_file_path: str, prompt_template: str = LIBRAR
 
         # 3. Generate Q&A pairs
         qa_json_str = generate_qa_pairs(
-            target_file_name=target_path_obj.name,
+            target_file_name=target_file_path,
             target_file_content=target_file_content,
             pruned_context_bundle=pruned_context_bundle,
             prompt_template=prompt_template
@@ -212,9 +214,9 @@ def file2qa(repo_path: str, target_file_path: str, prompt_template: str = LIBRAR
         if qa_json_str:
             new_data = json.loads(qa_json_str)
 
-            # Add filename field to each entry
+            # Add filepath field to each entry
             for entry in new_data:
-                entry["filename"] = target_path_obj.name
+                entry["filepath"] = target_file_path
 
             # Append new Q&A pairs to the existing data
             existing_data.extend(new_data)
@@ -225,6 +227,81 @@ def file2qa(repo_path: str, target_file_path: str, prompt_template: str = LIBRAR
             print(f"  - SUCCESS: Saved Q&A to {output_path.name}")
         else:
             print("  - FAILED: No Q&A data was generated.")
+
+    except FileNotFoundError:
+        print(f"!! ERROR: Target file not found at {target_file_path}")
+    except Exception as e:
+        print(f"!! ERROR: An unexpected error occurred while processing {target_path_obj.name}: {e}")
+
+
+def enhance_repo_file_qa(repo_path: str, target_file_path: str, prompt_template: str = LIBRARY_SOURCE_CODE_TO_QA_PROMPT_TEMPLATE, rst_path: str = "library-source-code-to-qa.jsonl") -> None:
+    """
+    Enhances the Q&A generation for a specific file in a repository. 
+    The rst_path already have the Q&A pairs of this file, this method will generate more Q&A pairs for this file.
+    The prompt template will add the context of existed Q&A pairs to the prompt.
+    The rst file will be sorted by the filepath.
+
+    :param repo_path: The root path of the repository.
+    :param target_file_path: The absolute path to the target .java file.
+    :param prompt_template: The template used to format the prompt for the LLM.
+    :param rst_path: The path where the generated Q&A will be saved as a JSON file.
+    :return: save the enhanced Q&A pairs to a JSON file.
+    """
+    target_path_obj = Path(target_file_path)
+    output_path = Path(rst_path)
+
+    try:
+        # 1. Read existing Q&A pairs
+        existing_data = []
+        if os.path.exists(output_path):
+            with open(output_path, 'r', encoding="utf-8") as f:
+                existing_data = json.load(f)
+
+        # Find existing Q&A pairs for the target file
+        target_qa_pairs = [entry for entry in existing_data if entry.get("filepath") == target_file_path]
+        other_qa_pairs = [entry for entry in existing_data if entry.get("filepath") != target_file_path]
+        # 2. Read the target file content
+        target_file_content = target_path_obj.read_text(encoding="utf-8")
+
+        # 3. Build the context bundle from sibling files
+        print("  - Building context bundle...")
+        pruned_context_bundle = build_pruned_context_bundle(repo_path, target_file_path)
+
+        # 4. Add existing Q&A pairs to the prompt template
+        if target_qa_pairs:
+            existing_qa_context = "\n\n#If exist Q&A pair, you should generate more Q&A pairs that different from the existing ones. \n\n## EXISTING Q&A PAIRS:\n"
+            for qa in target_qa_pairs:
+                existing_qa_context += f"Q: {qa['query']}\nA: {qa['response']}\n\n"
+            prompt_template = prompt_template.replace("# OUTPUT FORMAT", f"{existing_qa_context}# OUTPUT FORMAT")
+
+        # 5. Generate new Q&A pairs
+        qa_json_str = generate_qa_pairs(
+            target_file_name=target_file_path,
+            target_file_content=target_file_content,
+            pruned_context_bundle=pruned_context_bundle,
+            prompt_template=prompt_template
+        )
+
+        # 6. Save the result to a file
+        if qa_json_str:
+            new_data = json.loads(qa_json_str)
+
+            # Add filepath field to each entry
+            for entry in new_data:
+                entry["filepath"] = target_file_path
+
+            # Combine other files' Q&A pairs with new Q&A pairs
+            combined_data = existing_data + new_data
+
+            # Sort the combined data by filepath
+            combined_data.sort(key=lambda x: x["filepath"])
+
+            # Write the updated data back to the file
+            with open(output_path, 'w', encoding="utf-8") as f:
+                json.dump(combined_data, f, ensure_ascii=False, indent=2)
+            print(f"  - SUCCESS: Enhanced Q&A saved to {output_path.name}")
+        else:
+            print("  - FAILED: No enhanced Q&A data was generated.")
 
     except FileNotFoundError:
         print(f"!! ERROR: Target file not found at {target_file_path}")
@@ -264,5 +341,6 @@ def repo2qa(repo_path: str, prompt_template: str = LIBRARY_SOURCE_CODE_TO_QA_PRO
 if __name__ == "__main__":
     fire.Fire({
         "repo": repo2qa,
+        "repo_file_enhance": enhance_repo_file_qa,
         "file": file2qa
     })
