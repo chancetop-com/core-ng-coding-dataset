@@ -6625,6 +6625,31 @@
     "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\http\\HTTPClientImpl.java"
   },
   {
+    "query": "How does `HTTPClientImpl` handle exceptions during HTTP requests, and what is the significance of the error codes used in `HTTPClientException`?",
+    "response": "`HTTPClientImpl` catches `IOException` during HTTP requests and wraps it in a `HTTPClientException` with a descriptive error message and an error code. The error codes, such as `HTTP_REQUEST_FAILED` and `INVALID_URL`, are used to categorize the type of failure for easier debugging and monitoring. These codes are also logged with markers (`errorCode`) to facilitate structured logging and integration with monitoring tools.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\http\\HTTPClientImpl.java"
+  },
+  {
+    "query": "What is the purpose of the `headers` method in `HTTPClientImpl`, and why does it use a `TreeMap` with `CASE_INSENSITIVE_ORDER`?",
+    "response": "The `headers` method extracts HTTP response headers into a `Map` for easier access and manipulation. It uses a `TreeMap` with `CASE_INSENSITIVE_ORDER` to ensure header names are treated case-insensitively, as per the HTTP specification. This design choice simplifies header lookups and avoids issues caused by varying capitalization in header names.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\http\\HTTPClientImpl.java"
+  },
+  {
+    "query": "Why does `HTTPClientImpl` use `FieldMapLogParam` for logging request parameters and headers, and how does this improve security and debugging?",
+    "response": "`FieldMapLogParam` is used to serialize and log request parameters and headers in a controlled manner. It ensures sensitive data, such as authorization tokens or query parameters, is masked or omitted from logs. This approach improves security by preventing accidental exposure of sensitive information while providing structured and readable logs for debugging.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\http\\HTTPClientImpl.java"
+  },
+  {
+    "query": "How does `HTTPClientImpl` ensure compliance with HTTP standards when handling request bodies for GET and HEAD methods?",
+    "response": "`HTTPClientImpl` sets the request body to `null` for GET and HEAD methods, as per HTTP standards, which specify that these methods should not have a body. For other methods, it assigns an empty byte array if no body is provided. This ensures compatibility with HTTP specifications and avoids unexpected behavior in downstream systems.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\http\\HTTPClientImpl.java"
+  },
+  {
+    "query": "What is the role of the `slowOperationThresholdInNanos` method in `HTTPClientImpl`, and how does it balance global and per-request configurations?",
+    "response": "The `slowOperationThresholdInNanos` method determines the threshold for identifying slow HTTP operations. It first checks if the `HTTPRequest.slowOperationThreshold` is set for the specific request, allowing customization for individual operations. If not set, it defaults to the global threshold defined in the constructor. This design balances flexibility for specific requests with consistency across the framework.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\http\\HTTPClientImpl.java"
+  },
+  {
     "query": "What is the purpose of the `HTTPEventListenerFactory` class, and how does it integrate with OkHttp's `EventListener.Factory` interface?",
     "response": "The `HTTPEventListenerFactory` class implements OkHttp's `EventListener.Factory` interface to create instances of `Listener` for each HTTP call. This integration allows the framework to monitor and log key events during the lifecycle of an HTTP request, such as DNS resolution and socket connection establishment. By leveraging OkHttp's event listener mechanism, the framework can track performance metrics and log detailed information about HTTP operations, which is crucial for debugging and performance analysis.",
     "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\http\\HTTPEventListenerFactory.java"
@@ -7325,6 +7350,31 @@
     "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\log\\ActionLog.java"
   },
   {
+    "query": "What is the purpose of the `initializeWarnings(PerformanceWarning[] warnings)` method in `ActionLog.java`, and how does it utilize `PerformanceStat` objects?",
+    "response": "The `initializeWarnings(PerformanceWarning[] warnings)` method is responsible for setting up performance monitoring for specific operations. It iterates through the provided `PerformanceWarning` array and creates a `PerformanceStat` object for each warning, storing them in the `performanceStats` map with the operation name as the key. This allows the `ActionLog` to track performance metrics and enforce thresholds for operations, ensuring that warnings are generated if predefined limits are exceeded.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\log\\ActionLog.java"
+  },
+  {
+    "query": "How does the `track(String operation, long elapsed, int readEntries, int writeEntries)` method contribute to performance monitoring in `ActionLog.java`?",
+    "response": "The `track(String operation, long elapsed, int readEntries, int writeEntries)` method updates the performance statistics for a given operation. It retrieves or creates a `PerformanceStat` object for the operation using the `performanceStats` map and calls its `track` method to record the elapsed time, read entries, and write entries. This method helps monitor the performance of specific operations and ensures that metrics are aggregated for later analysis or warning generation.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\log\\ActionLog.java"
+  },
+  {
+    "query": "Why does the `context(String key, Object... values)` method use `Markers.errorCode` from the `Markers` class when logging warnings about oversized context values?",
+    "response": "The `context(String key, Object... values)` method uses `Markers.errorCode` to attach a specific error code (`CONTEXT_TOO_LARGE`) to log events when context values exceed the maximum length or size limits. This integration with the `Markers` class ensures that these warnings are easily identifiable and can be filtered or analyzed downstream in log processing systems. It provides a structured way to categorize and handle such issues within the logging framework.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\log\\ActionLog.java"
+  },
+  {
+    "query": "What is the significance of the `flushTraceLog()` method in `ActionLog.java`, and how does it determine whether to flush trace logs?",
+    "response": "The `flushTraceLog()` method determines whether detailed trace logs should be flushed for the current action. It returns `true` if the `trace` field is set to a value other than `Trace.NONE` or if the `result` log level is WARN or higher. This ensures that trace logs are only flushed when explicitly requested or when the action encounters significant issues, such as warnings or errors. This design balances the need for detailed logging with the goal of minimizing unnecessary log output during normal operation.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\log\\ActionLog.java"
+  },
+  {
+    "query": "How does the `remainingProcessTimeInNano()` method calculate the remaining processing time, and what role does `warningContext` play in this calculation?",
+    "response": "The `remainingProcessTimeInNano()` method calculates the remaining processing time by subtracting the elapsed time (obtained via `elapsed()`) from the maximum allowed processing time (`warningContext.maxProcessTimeInNano`). If the remaining time is negative, it returns 0. The `warningContext` object plays a crucial role by defining the maximum processing time threshold, which is used to ensure that actions do not exceed predefined limits, helping to enforce performance constraints.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\log\\ActionLog.java"
+  },
+  {
     "query": "What is the purpose of the `CollectStatTask` class, and how does it integrate with the `StatCollector` and `LogAppender` components?",
     "response": "The `CollectStatTask` class is responsible for periodically collecting system and application metrics and logging them for monitoring purposes. It integrates with `StatCollector` to gather various statistics such as JVM usage, memory usage, and custom metrics. These statistics are encapsulated in a `Stats` object. The class then uses `LogAppender` to append these statistics as a `StatMessage`, which is structured for logging and further processing. This design ensures separation of concerns: `StatCollector` handles data collection, while `LogAppender` handles data persistence or transmission.",
     "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\log\\CollectStatTask.java"
@@ -7997,6 +8047,31 @@
   {
     "query": "What is the role of the `validate` method in `ModuleContext`, and how does it ensure the correctness of properties and configurations?",
     "response": "The `validate` method ensures the correctness of properties and configurations by first validating all property keys using `PropertyValidator`. It then iterates through all registered configurations in the `configs` map and invokes their `validate` method. This two-step process ensures that both application properties and module-specific configurations are correctly defined and meet the framework's requirements, preventing runtime errors due to misconfigurations.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\module\\ModuleContext.java"
+  },
+  {
+    "query": "Why does `ModuleContext` use `ShutdownHook` with multiple stages, and how does this design contribute to the framework's reliability during application shutdown?",
+    "response": "The `ShutdownHook` in `ModuleContext` is designed with multiple stages to ensure a structured and orderly shutdown process. Each stage corresponds to specific tasks, such as stopping HTTPServer (`STAGE_0`), awaiting request completion (`STAGE_1`), shutting down background tasks (`STAGE_2`), and ensuring termination of executors (`STAGE_3`). This staged approach allows critical components to complete their operations before lower-priority tasks are terminated, minimizing the risk of resource leaks or incomplete operations during shutdown. For example, HTTPServer's termination is delayed until all requests are processed, ensuring graceful handling of in-flight operations.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\module\\ModuleContext.java"
+  },
+  {
+    "query": "How does `ModuleContext` ensure thread safety when accessing or creating configuration objects in the `config` method?",
+    "response": "The `config` method in `ModuleContext` ensures thread safety by avoiding the use of `computeIfAbsent` on the `configs` map, which could lead to concurrent modification issues during nested calls. Instead, it explicitly checks if the configuration object exists and creates it using reflection only if necessary. This approach prevents race conditions and ensures that configuration objects are initialized in a controlled manner. Additionally, the method uses synchronized access to the `configs` map, ensuring that no two threads can simultaneously modify the map during configuration creation.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\module\\ModuleContext.java"
+  },
+  {
+    "query": "What is the purpose of the `route` method in `ModuleContext`, and how does it leverage `PathPatternValidator` and `ControllerClassValidator` to ensure route correctness?",
+    "response": "The `route` method in `ModuleContext` is responsible for registering HTTP routes within the framework. It uses `PathPatternValidator` to validate the syntax and structure of the provided path, ensuring it adheres to the framework's standards and supports wildcards if necessary. Additionally, it employs `ControllerClassValidator` to validate the controller's class and method, ensuring they conform to expected patterns and annotations. These validations prevent misconfigured routes and ensure that registered controllers are compatible with the framework's routing mechanism. Once validated, the route is added to the `HTTPServer`'s `httpHandler.route` with a `ControllerHolder` encapsulating the controller and metadata.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\module\\ModuleContext.java"
+  },
+  {
+    "query": "How does `ModuleContext` integrate the `HTTPServer` with the framework's metrics collection system, and why is this integration important?",
+    "response": "`ModuleContext` integrates the `HTTPServer` with the framework's metrics collection system by adding an instance of `HTTPServerMetrics` to the `StatCollector` during the server's creation. This integration is important because it allows the framework to monitor and collect performance metrics related to HTTP requests, such as request counts, response times, and error rates. These metrics are crucial for diagnosing issues, optimizing performance, and ensuring the reliability of the application. By tying `HTTPServerMetrics` directly to the `StatCollector`, the framework ensures that HTTP-related metrics are automatically included in the application's overall statistics.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\module\\ModuleContext.java"
+  },
+  {
+    "query": "Why does `ModuleContext` bind core beans like `WebContext`, `SessionContext`, and `WebDirectory` during `HTTPServer` creation, and how does this affect dependency injection in the framework?",
+    "response": "`ModuleContext` binds core beans like `WebContext`, `SessionContext`, and `WebDirectory` during `HTTPServer` creation to ensure these essential components are available for dependency injection throughout the application. These beans are integral to the framework's web functionality, enabling features such as session management, request/response handling, and access to the web directory. By binding them early in the lifecycle, the framework guarantees that they can be injected into controllers, services, or other components as needed, promoting modularity and reducing coupling between components.",
     "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\module\\ModuleContext.java"
   },
   {
@@ -10175,6 +10250,31 @@
     "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\BeanValidatorBuilder.java"
   },
   {
+    "query": "How does `BeanValidatorBuilder` dynamically generate validation logic for nested beans, and what role does `CodeBuilder` play in this process?",
+    "response": "`BeanValidatorBuilder` dynamically generates validation logic for nested beans by recursively invoking the `validateMethod` for each nested bean class. The `validateMethod` constructs Java code using `CodeBuilder`, which provides a fluent API for building Java source code at runtime. This code includes validation checks for annotations like `@NotNull`, `@Size`, and others, and is added as methods to the dynamically created `BeanValidator` class using `DynamicInstanceBuilder`. This approach ensures that validation logic is tailored to the structure and annotations of the bean hierarchy.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\BeanValidatorBuilder.java"
+  },
+  {
+    "query": "What is the purpose of the `validateAnnotations` method in `BeanValidatorBuilder`, and how does it ensure the correctness of validation annotations?",
+    "response": "The `validateAnnotations` method ensures that validation annotations are applied correctly to fields by checking their compatibility with the field's type. For example, it verifies that `@Size` is only applied to `String`, `List`, or `Map`, and that `@Pattern` is applied to `String`. If an annotation is misconfigured, it throws an `Error` with a detailed message, preventing the application from starting with invalid configurations. This method also validates the syntax of patterns in `@Pattern` annotations to ensure they are valid regular expressions.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\BeanValidatorBuilder.java"
+  },
+  {
+    "query": "How does `BeanValidatorBuilder` handle validation for collection types like `List` and `Map`, and what mechanisms are used to validate their elements?",
+    "response": "`BeanValidatorBuilder` handles validation for collections by first checking size constraints using the `@Size` annotation. For `List` types, it iterates through each element and validates them if they are beans. For `Map` types, it validates the values of the map entries if they are beans. The `GenericTypes` utility class is used to determine the raw class of the collection's elements or map values, enabling the builder to identify whether further validation is required for nested beans. This ensures comprehensive validation of complex object graphs.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\BeanValidatorBuilder.java"
+  },
+  {
+    "query": "Why does `BeanValidatorBuilder` use `DynamicInstanceBuilder` to create a `BeanValidator` instance, and what advantages does this approach provide?",
+    "response": "`BeanValidatorBuilder` uses `DynamicInstanceBuilder` to create a `BeanValidator` instance to dynamically generate and compile validation logic at runtime. This approach allows the framework to adapt to the specific structure and annotations of the bean class being validated without requiring precompiled validation logic. It provides flexibility, reduces boilerplate code, and ensures that validation rules are tightly coupled with the bean's structure, improving maintainability and reducing the risk of mismatched validation logic.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\BeanValidatorBuilder.java"
+  },
+  {
+    "query": "What is the rationale behind the `beanClass` method in `BeanValidatorBuilder`, and how does it determine whether a class should be validated?",
+    "response": "The `beanClass` method determines whether a class should be validated by checking its package name, type, and specific exclusions. It excludes Java built-in classes, enums, and certain external types like `org.bson.types.ObjectId` to avoid unnecessary validation of non-bean types. This method ensures that only application-specific beans are subjected to validation, optimizing performance and avoiding dependency on external libraries unless explicitly required.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\BeanValidatorBuilder.java"
+  },
+  {
     "query": "What is the purpose of the `visitedClasses` set in `ClassValidator.java`, and how does it prevent circular references during validation?",
     "response": "The `visitedClasses` set is used to track the classes that have already been visited during the validation process. This prevents circular references by ensuring that a class is not revisited once it has been processed. If a circular reference is detected (i.e., the class is already in the `visitedClasses` set), an error is thrown with a message indicating the problematic field using `Fields.path(owner)`. This design ensures the integrity of the validation process and avoids infinite recursion.",
     "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\ClassValidator.java"
@@ -10197,6 +10297,31 @@
   {
     "query": "How does `ClassValidator` ensure that map keys and values conform to specific constraints, and what happens if these constraints are violated?",
     "response": "`ClassValidator` ensures that map keys and values conform to specific constraints by using methods from `GenericTypes`. Map keys must be either `String` or `Enum`, validated using `GenericTypes.mapKeyClass()`. Map values must be either valid classes or lists of valid classes, checked using `GenericTypes.mapValueType()` and `GenericTypes.listValueClass()`. If these constraints are violated, an error is thrown with a detailed message indicating the problematic field, constructed using `Fields.path(owner)`. This strict validation ensures that maps adhere to the expected structure and type safety.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\ClassValidator.java"
+  },
+  {
+    "query": "How does the `visitObject` method in `ClassValidator.java` ensure that all fields of a class are validated, and what role does the `support.declaredFields()` method play in this process?",
+    "response": "The `visitObject` method iterates through all declared fields of the provided class using the `support.declaredFields()` method, which retrieves the fields of the class while respecting encapsulation rules. For each field, it determines the field type and delegates validation to specialized methods such as `visitList`, `visitMap`, or `visitValue`. This ensures that every field is validated according to its type, and any nested objects or collections are recursively processed. The use of `support.declaredFields()` abstracts away the complexity of field retrieval, making the validation logic cleaner and more focused.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\ClassValidator.java"
+  },
+  {
+    "query": "Why does `ClassValidator` remove the `objectClass` from the `visitedClasses` set at the end of the `visitObject` method, and what would happen if this step were omitted?",
+    "response": "The removal of `objectClass` from the `visitedClasses` set at the end of `visitObject` is crucial to allow re-validation of the same class in different contexts or paths during the recursive validation process. If this step were omitted, subsequent validations of the same class would incorrectly trigger a circular reference error, even when no actual circular dependency exists. This design ensures that the circular reference check is context-sensitive and does not falsely block valid recursive validations.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\ClassValidator.java"
+  },
+  {
+    "query": "What is the purpose of the `allowedValueClasses` set in `ClassValidator.java`, and how does it influence the validation of field types?",
+    "response": "The `allowedValueClasses` set defines a whitelist of classes that are considered valid value types during validation. When a field's type matches one of the classes in this set, it is accepted without further recursive validation. This mechanism allows developers to specify domain-specific classes that are inherently valid, optimizing the validation process by avoiding unnecessary checks for these types. If a field's type is not in this set and does not meet other criteria (e.g., being an enum or a supported Java type), an error is thrown.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\ClassValidator.java"
+  },
+  {
+    "query": "How does the `visitMap` method ensure that both keys and values of a map field conform to specific constraints, and what happens if these constraints are violated?",
+    "response": "The `visitMap` method uses `GenericTypes.mapKeyClass()` to validate that map keys are either `String` or `Enum`. It also uses `GenericTypes.mapValueType()` to inspect the value type, ensuring it is either a valid class or a generic list of valid classes. If the map does not conform to these constraints, an error is thrown with a detailed message indicating the problematic field, constructed using `Fields.path(owner)`. This strict validation ensures type safety and adherence to the expected structure for maps within the framework.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\ClassValidator.java"
+  },
+  {
+    "query": "What is the significance of the `path` method in `ClassValidator.java`, and how does it contribute to error reporting during validation?",
+    "response": "The `path` method constructs a hierarchical representation of a field's location within an object graph, combining the parent path and the field name. This is used extensively in error messages to provide clear and precise diagnostics when validation fails. By including the full path to the problematic field, developers can quickly identify and address issues in deeply nested object structures, making the validation process more transparent and user-friendly.",
     "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\validate\\ClassValidator.java"
   },
   {
@@ -11147,6 +11272,31 @@
   {
     "query": "How does the `cleanup` method in `WebContextImpl` prevent memory leaks, and why is it necessary in a `ThreadLocal`-based design?",
     "response": "The `cleanup` method removes the `Context` instance from the `ThreadLocal` after the request is processed. This is necessary because `ThreadLocal` can retain references to objects even after the thread is reused, potentially causing memory leaks in environments like thread pools. By explicitly calling `cleanup`, the framework ensures that the `ThreadLocal` does not hold onto stale `Context` instances, maintaining efficient memory usage and preventing unintended retention of request-specific data.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\web\\controller\\WebContextImpl.java"
+  },
+  {
+    "query": "Why does `WebContextImpl` use a nested static `Context` class, and what role does it play in managing request-specific data?",
+    "response": "The nested static `Context` class encapsulates request-specific data, such as the `Request` object, a map for storing arbitrary context values, and a map for managing response cookies. By grouping these elements into a single class, `WebContextImpl` simplifies the management of request-scoped state. This design ensures that all relevant data for a request is isolated within the `ThreadLocal` instance, making it easier to clean up after the request is processed and reducing the risk of accidental data leakage between threads.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\web\\controller\\WebContextImpl.java"
+  },
+  {
+    "query": "How does the `handleResponse` method ensure that cookies set during request processing are properly applied to the `Response` object?",
+    "response": "The `handleResponse` method iterates over the `responseCookies` map stored in the `Context` instance and applies each cookie to the `Response` object using the `Response.cookie(CookieSpec spec, @Nullable String value)` method. This approach decouples the process of setting cookies during request handling from the actual response generation, allowing cookies to be dynamically added throughout the request lifecycle and ensuring they are consistently applied when the response is finalized.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\web\\controller\\WebContextImpl.java"
+  },
+  {
+    "query": "What is the significance of the `initialize` method in `WebContextImpl`, and how does it interact with the `Request` object?",
+    "response": "The `initialize` method creates a new `Context` instance and associates it with the current thread via `ThreadLocal`. This `Context` instance is initialized with the incoming `Request` object, ensuring that all subsequent operations within the thread have access to request-specific data. By invoking `initialize` at the start of request processing, the framework guarantees that each thread has a dedicated context, enabling features like request-scoped data storage and cookie management.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\web\\controller\\WebContextImpl.java"
+  },
+  {
+    "query": "What potential issues could arise if the `cleanup` method is not called after request processing, and how does it address these issues?",
+    "response": "If the `cleanup` method is not called, the `ThreadLocal` may retain references to the `Context` instance even after the thread is reused, leading to memory leaks in environments like thread pools. This can result in stale data persisting across requests, violating thread safety and consuming unnecessary memory. The `cleanup` method explicitly removes the `Context` instance from the `ThreadLocal`, ensuring that no residual data remains and preventing unintended retention of request-specific state.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\web\\controller\\WebContextImpl.java"
+  },
+  {
+    "query": "How does `WebContextImpl` handle scenarios where `responseCookie` is called multiple times with the same `CookieSpec` during a single request lifecycle?",
+    "response": "When `responseCookie` is called multiple times with the same `CookieSpec`, the latest value overwrites the previous value in the `responseCookies` map within the `Context`. This behavior ensures that the most recent cookie configuration is applied to the `Response` object during the `handleResponse` phase. The use of a map for storing cookies provides efficient key-based access and avoids duplication, simplifying cookie management during request processing.",
     "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\web\\controller\\WebContextImpl.java"
   },
   {
@@ -12472,6 +12622,31 @@
   {
     "query": "How does the `join` method ensure that a channel is correctly added to a group, and what role does `computeIfAbsent` play in this process?",
     "response": "The `join` method adds a channel to a specified group by first updating the channel's `groups` list and then using `computeIfAbsent` to ensure the group exists in the `groups` map. If the group does not exist, `computeIfAbsent` initializes it with a new `ConcurrentHashMap`. This approach guarantees atomicity and thread safety, preventing race conditions where multiple threads might attempt to create or modify the same group simultaneously.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\web\\sse\\ServerSentEventContextImpl.java"
+  },
+  {
+    "query": "How does the `keepAlive` method in `ServerSentEventContextImpl` ensure that inactive channels are periodically sent heartbeat messages, and what is the significance of the `15_000_000_000L` threshold?",
+    "response": "The `keepAlive` method iterates through all active channels and checks the time elapsed since the last message was sent using the `lastSentTime` property of `ChannelImpl`. If the elapsed time exceeds `15_000_000_000L` nanoseconds (15 seconds), it sends a heartbeat message (`:\n`) to the channel using `sendBytes`. This threshold is chosen to align with typical SSE connection timeout intervals, ensuring that connections remain active and do not close due to inactivity.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\web\\sse\\ServerSentEventContextImpl.java"
+  },
+  {
+    "query": "What is the role of the `join` method in `ServerSentEventContextImpl`, and how does it ensure thread-safe addition of channels to groups?",
+    "response": "The `join` method adds a channel to a specified group by first updating the channel's `groups` list and then using `computeIfAbsent` to ensure the group exists in the `groups` map. If the group does not exist, `computeIfAbsent` initializes it with a new `ConcurrentHashMap`. This guarantees atomicity and thread safety, preventing race conditions where multiple threads might attempt to create or modify the same group simultaneously. Additionally, the use of `ConcurrentHashMap` ensures that the group can be safely accessed and modified by multiple threads.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\web\\sse\\ServerSentEventContextImpl.java"
+  },
+  {
+    "query": "Why does the `remove` method in `ServerSentEventContextImpl` include logic to handle race conditions when cleaning up empty groups?",
+    "response": "The `remove` method ensures that when a channel is removed, it is also removed from all groups it belongs to. If a group becomes empty after the removal, the method attempts to clean up the group by removing it from the `groups` map. The conditional logic (`if (previous != null && !previous.isEmpty()`) accounts for potential race conditions where another thread might add a channel to the group before the cleanup completes. This design ensures thread safety while maintaining the integrity of the `groups` map, avoiding unintended deletion of groups that are still in use.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\web\\sse\\ServerSentEventContextImpl.java"
+  },
+  {
+    "query": "Why does `ServerSentEventContextImpl` use `new ArrayList<>(Collection)` instead of `List.copyOf` in the `all` and `group` methods, and what are the performance implications?",
+    "response": "`new ArrayList<>(Collection)` is used instead of `List.copyOf` because it is faster and does not perform null element checks. In the context of `ServerSentEventContextImpl`, the `channels` and `groups` maps are guaranteed to contain non-null elements, so the additional checks performed by `List.copyOf` are unnecessary. This choice prioritizes performance, especially when dealing with large collections of channels or groups, as it avoids the overhead of validating each element in the collection.",
+    "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\web\\sse\\ServerSentEventContextImpl.java"
+  },
+  {
+    "query": "How does the `add` method in `ServerSentEventContextImpl` ensure that channels are correctly registered, and what is its relationship with the `ChannelImpl` class?",
+    "response": "The `add` method registers a channel by adding it to the `channels` map using its unique `id` as the key. This method relies on the `ChannelImpl` class, which provides the `id` property to uniquely identify each channel. By using `ChannelImpl`, the framework ensures that channels are properly encapsulated with their associated metadata, such as `groups` and `lastSentTime`. This design allows efficient management and retrieval of channels during operations like broadcasting or group-specific messaging.",
     "filepath": "D:\\core-ng-project\\core-ng\\src\\main\\java\\core\\framework\\internal\\web\\sse\\ServerSentEventContextImpl.java"
   },
   {

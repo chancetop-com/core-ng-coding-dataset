@@ -1,12 +1,14 @@
+# @author: stephen
+
 import fire
 import litellm
 import json
 import os
 import textwrap
-import subprocess
 from pathlib import Path
 from typing import Optional
 from token_cost_counter import count_cost
+from library.repo_java_parser import RepoJavaParser
 
 
 LIBRARY_SOURCE_CODE_TO_QA_PROMPT_TEMPLATE = textwrap.dedent("""
@@ -116,7 +118,7 @@ def generate_qa_pairs(target_file_name: str, target_file_content: str, pruned_co
         return None
 
 
-def build_pruned_context_bundle(repo_path: str, target_file_path: str) -> str:
+def build_pruned_context_bundle(repo_parser: RepoJavaParser, target_file_path: str) -> str:
     """
     Build a pruned context bundle by calling an external Java parser script.
 
@@ -124,52 +126,18 @@ def build_pruned_context_bundle(repo_path: str, target_file_path: str) -> str:
     analysis on the target Java file and get its relevant dependencies.
 
     Args:
-        repo_path: The root path of the repository.
+        repo_parser: The repository parser object.
         target_file_path: The absolute path to the target .java file.
 
     Returns:
         A single string containing the concatenated context from the parser,
         or an empty string if an error occurs.
     """
-    try:
-        parser_script_path = Path(__file__).parent.resolve() / "repo_java_parser.py"
-        # Define the command to execute the external script
-        command = [
-            "python",
-            str(parser_script_path),
-            "resolve",
-            str(repo_path),
-            str(target_file_path)
-        ]
-
-        # Execute the command and capture the output
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
-            check=True,  # Raise an exception for non-zero exit codes
-            encoding='utf-8'
-        )
-        
-        # The standard output of the script is the context bundle
-        return result.stdout
-
-    except FileNotFoundError:
-        print(f"!! ERROR: The parser script 'repo_java_parser.py' was not found.")
-        print("!! Ensure the script is in your current directory or system's PATH.")
-        return ""
-    except subprocess.CalledProcessError as e:
-        # This error is raised when the script returns a non-zero exit code (i.e., it failed)
-        print(f"!! ERROR: The parser script failed while processing '{Path(target_file_path).name}'.")
-        print(f"   - Exit Code: {e.returncode}")
-        print(f"   - Stderr:\n{e.stderr}")
-        return ""
-    except Exception as e:
-        print(f"!! ERROR: An unexpected error occurred while building the context bundle for '{Path(target_file_path).name}': {e}")
-        return ""
+    refers = repo_parser.find_references(target_file_path)
+    return "\n\n".join([str(refer) for refer in refers])
 
 
-def file2qa(repo_path: str, target_file_path: str, prompt_template: str = LIBRARY_SOURCE_CODE_TO_QA_PROMPT_TEMPLATE, rst_path: str = "library-source-code-to-qa.jsonl") -> None:
+def file2qa(repo_parser: RepoJavaParser, target_file_path: str, prompt_template: str = LIBRARY_SOURCE_CODE_TO_QA_PROMPT_TEMPLATE, rst_path: str = "library-source-code-to-qa.jsonl") -> None:
     """
     Orchestrates the Q&A generation process for a single Java file.
     It builds the context, generates the Q&A, and saves it to a .json file.
@@ -200,7 +168,7 @@ def file2qa(repo_path: str, target_file_path: str, prompt_template: str = LIBRAR
 
         # 2. Build the context bundle from sibling files
         print("  - Building context bundle...")
-        pruned_context_bundle = build_pruned_context_bundle(repo_path, target_file_path)
+        pruned_context_bundle = build_pruned_context_bundle(repo_parser, target_file_path)
 
         # 3. Generate Q&A pairs
         qa_json_str = generate_qa_pairs(
@@ -247,6 +215,7 @@ def enhance_repo_file_qa(repo_path: str, target_file_path: str, prompt_template:
     :param rst_path: The path where the generated Q&A will be saved as a JSON file.
     :return: save the enhanced Q&A pairs to a JSON file.
     """
+    repo_parser = RepoJavaParser(repo_path)
     target_path_obj = Path(target_file_path)
     output_path = Path(rst_path)
 
@@ -259,13 +228,12 @@ def enhance_repo_file_qa(repo_path: str, target_file_path: str, prompt_template:
 
         # Find existing Q&A pairs for the target file
         target_qa_pairs = [entry for entry in existing_data if entry.get("filepath") == target_file_path]
-        other_qa_pairs = [entry for entry in existing_data if entry.get("filepath") != target_file_path]
         # 2. Read the target file content
         target_file_content = target_path_obj.read_text(encoding="utf-8")
 
         # 3. Build the context bundle from sibling files
         print("  - Building context bundle...")
-        pruned_context_bundle = build_pruned_context_bundle(repo_path, target_file_path)
+        pruned_context_bundle = build_pruned_context_bundle(repo_parser, target_file_path)
 
         # 4. Add existing Q&A pairs to the prompt template
         if target_qa_pairs:
@@ -317,19 +285,17 @@ def repo2qa(repo_path: str, prompt_template: str = LIBRARY_SOURCE_CODE_TO_QA_PRO
     print("=" * 60)
 
     repo_path_obj = Path(repo_path)
-    if not repo_path_obj.is_dir():
-        print(f"Error: Provided path '{repo_path}' is not a valid directory.")
-        return
+    repo_parser = RepoJavaParser(repo_path)
+    total_files = len(repo_parser.result)
 
-    java_files = list(repo_path_obj.rglob("*.java"))
-    total_files = len(java_files)
     print(f"Found {total_files} .java files to process.\n")
 
-    for i, file_path in enumerate(java_files):
-        relative_path = file_path.relative_to(repo_path_obj)
+    for i, file_path in enumerate(repo_parser.result):
+        file_path_obj = Path(file_path)
+        relative_path = file_path_obj.relative_to(repo_path_obj)
         print(f"[{i + 1}/{total_files}] Processing: {relative_path}")
         try:
-            file2qa(repo_path, str(file_path), prompt_template, rst_path)
+            file2qa(repo_parser, file_path, prompt_template, rst_path)
         except Exception as e:
             print(f"  !! FATAL ERROR in file2qa for {relative_path}: {e}")
         print("-" * 40)

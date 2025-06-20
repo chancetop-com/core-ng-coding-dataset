@@ -3,7 +3,7 @@ import fire
 import litellm
 from tqdm import tqdm
 from typing import Tuple
-from gitignore import GitignoreMatcher
+from library.git_ignore import GitignoreMatcher
 
 # Suppress litellm's informational messages for a cleaner output
 litellm.suppress_prompt_logging = True

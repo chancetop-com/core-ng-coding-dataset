@@ -1,3 +1,5 @@
+# @author: stephen
+
 import fire
 import textwrap
 from repo2qa import repo2qa, file2qa
