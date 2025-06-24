@@ -5,7 +5,17 @@ from pathlib import Path
 from tree_sitter import Language, Parser, Node
 
 
+
 LANGUAGE = Language(tsj.language())
+# no need to collect all java.lang classes, just a few common ones for the first filter
+JAVA_LANG_CLASSES = {
+    "Object", "String", "StringBuilder", "StringBuffer", "Integer", "Long", "Double", "Float",
+    "Boolean", "Byte", "Short", "Character", "Void", "Math", "System", "Thread", "Runnable",
+    "Exception", "RuntimeException", "IllegalArgumentException", "IllegalStateException",
+    "NullPointerException", "IndexOutOfBoundsException", "Throwable", "Error", "Override",
+    "Deprecated", "SuppressWarnings", "Class", "ClassLoader"
+}
+JAVA_PRIMITIVE_TYPES = {"byte", "short", "int", "long", "float", "double", "boolean", "char", "void", "var"}
 
 
 class MethodParseResult:
@@ -34,7 +44,7 @@ class MethodParseResult:
         return " ".join(parts) + ";"
 
 
-class JavaFieldResult:
+class FieldParseResult:
     def __init__(self):
         self.modifiers: str = ""
         self.type: str = ""
@@ -60,7 +70,7 @@ class ClassParseResult:
         self.superclass: str = ""
         self.interfaces: str = ""
         self.methods: dict[str, MethodParseResult] = {}
-        self.fields: list[JavaFieldResult] = []
+        self.fields: list[FieldParseResult] = []
 
     def get_method_by_name(self, name: str) -> MethodParseResult:
         return self.methods[name]
@@ -89,17 +99,26 @@ class ClassParseResult:
             parts.append(self.interfaces)
         return " ".join(parts) + " {\n" + "\n".join(["    " + str(m) for m in self.methods.values()]) + "\n}" 
 
+class ImportParseResult:
+    def __init__(self):
+        self.package: str | None = ""
+        self.class_name: str = ""
+
+    def __repr__(self):
+        return "import " + self.package + "." + self.class_name + ";"
+
 class JavaParseResult:
     def __init__(self):
         self.path: str = ""
         self.package: str = ""
         self.root: str = ""
-        self.imports: list[str] = []
+        self.imports: list[ImportParseResult] = []
+        self.implicit_imports: list[str] = []
         self.classes: list[ClassParseResult] = []
     
     def get_import_by_class_name(self, class_name: str):
         for i in self.imports:
-            if i.endswith(class_name + ";"):
+            if i.class_name == class_name:
                 return i
         return None
     
@@ -117,7 +136,7 @@ class JavaFieldParser:
     def parse(self, content: str):
         if self.result is not None: return self.result
         
-        self.result = JavaFieldResult()
+        self.result = FieldParseResult()
         
         tree = self.parser.parse(content.encode())
         node = tree.root_node.children[0]
@@ -160,7 +179,7 @@ class JavaParser:
         return self.result
 
 
-    def _find_class(self, class_name: str) -> ClassParseResult:
+    def _find_class(self, class_name: str) -> ClassParseResult | None:
         """
         Helper method to find a class by name.
         
@@ -186,7 +205,7 @@ class JavaParser:
                 return method_node.text.decode('utf-8')
             return ""
     
-    def _find_method_node(self, node: Node, class_name: str, method_name: str, current_class: str = None) -> Node:
+    def _find_method_node(self, node: Node, class_name: str, method_name: str, current_class: str = None) -> Node | None:
         """
         Recursively find the method node in the AST.
         
@@ -210,7 +229,7 @@ class JavaParser:
                 current_class = name_node.text.decode('utf-8')
         
         # Check if current node is a method declaration in the target class
-        if (node.type == "method_declaration" and current_class == class_name):
+        if node.type == "method_declaration" and current_class == class_name:
             name_node = node.child_by_field_name('name')
             if name_node and name_node.text.decode('utf-8') == method_name:
                 return node
@@ -254,7 +273,7 @@ class JavaParser:
                     
         return used_imports
 
-    def get_method_signatrue_imports(self, class_name: str, method_name: str) -> list[str]:
+    def get_method_signature_imports(self, class_name: str, method_name: str) -> list[str]:
         """
         Get Java imports that are used in a method's signature.
         
@@ -304,55 +323,34 @@ class JavaParser:
 
         return self._get_method_imports(class_name, method_name, body + " " + related_fields)
 
-    def _build_class_parse_result(self, node: Node) -> ClassParseResult:
-        clazz = ClassParseResult()
-        clazz.type = node.type
-        if node.children[0].type == "modifiers":
-            clazz.modifiers = node.children[0].text.decode('utf-8')
-        name_node = node.child_by_field_name('name')
-        if name_node:
-            clazz.name = name_node.text.decode('utf-8')
-        type_parameters_node = node.child_by_field_name("type_parameters")
-        if type_parameters_node:
-            clazz.type_parameters = type_parameters_node.text.decode("utf-8")
-        superclass_node = node.child_by_field_name("superclass")
-        if superclass_node:
-            clazz.superclass = superclass_node.text.decode("utf-8")
-        interfaces_node = node.child_by_field_name("interfaces")
-        if interfaces_node:
-            clazz.interfaces = interfaces_node.text.decode("utf-8")
-        return clazz
-
-    def _build_method_parse_result(self, node: Node) -> MethodParseResult:
-        method = MethodParseResult()
-        if node.children[0].type == "modifiers":
-            method.modifiers = node.children[0].text.decode('utf-8')
-        name_node = node.child_by_field_name('name')
-        if name_node:
-            method.name = name_node.text.decode('utf-8')
-        parameters_node = node.child_by_field_name('parameters')
-        if parameters_node:
-            method.parameters = parameters_node.text.decode('utf-8')
-        type_node = node.child_by_field_name('type')
-        if type_node:
-            method.type = type_node.text.decode('utf-8')
-        type_parameters_node = node.child_by_field_name('type_parameters')
-        if type_parameters_node:
-            method.type = type_parameters_node.text.decode('utf-8')
-        throws_node = node.child_by_field_name('throws')
-        if throws_node:
-            method.type = throws_node.text.decode('utf-8')
-        return method
-
     def _traverse_tree(self, node: Node, rst: JavaParseResult, current_class: ClassParseResult = None):
-        if node.type == "package_declaration":
+        if node.type == "identifier":
+            identifier = node.text.decode('utf-8')
+            if identifier[0].isupper() \
+                    and identifier not in JAVA_LANG_CLASSES \
+                    and identifier not in JAVA_PRIMITIVE_TYPES \
+                    and identifier not in rst.implicit_imports \
+                    and identifier not in [i.class_name for i in rst.imports]:
+                rst.implicit_imports.append(identifier)
+
+        elif node.type == "type_identifier":
+            type_identifier = node.text.decode('utf-8')
+            if type_identifier[0].isupper() \
+                    and type_identifier not in JAVA_LANG_CLASSES \
+                    and type_identifier not in JAVA_PRIMITIVE_TYPES \
+                    and type_identifier not in rst.implicit_imports \
+                    and type_identifier not in [i.class_name for i in rst.imports]:
+                rst.implicit_imports.append(type_identifier)
+
+
+        elif node.type == "package_declaration":
             package_name_node = node.named_children[0]
             if package_name_node:
                 rst.package = package_name_node.text.decode('utf-8')
 
         elif node.type == "import_declaration":
             import_text = node.text.decode('utf-8')
-            rst.imports.append(import_text)
+            rst.imports.append(self._build_import_import_result(import_text))
 
         elif (node.type == "class_declaration" 
                 or node.type == "interface_declaration" 
@@ -383,11 +381,71 @@ class JavaParser:
             self._traverse_tree(child, rst, current_class)
 
 
+    # noinspection PyMethodMayBeStatic
+    def _build_class_parse_result(self, node: Node) -> ClassParseResult:
+        clazz = ClassParseResult()
+        clazz.type = node.type
+        if node.children[0].type == "modifiers":
+            clazz.modifiers = node.children[0].text.decode('utf-8')
+        name_node = node.child_by_field_name('name')
+        if name_node:
+            clazz.name = name_node.text.decode('utf-8')
+        type_parameters_node = node.child_by_field_name("type_parameters")
+        if type_parameters_node:
+            clazz.type_parameters = type_parameters_node.text.decode("utf-8")
+        superclass_node = node.child_by_field_name("superclass")
+        if superclass_node:
+            clazz.superclass = superclass_node.text.decode("utf-8")
+        interfaces_node = node.child_by_field_name("interfaces")
+        if interfaces_node:
+            clazz.interfaces = interfaces_node.text.decode("utf-8")
+        return clazz
+
+    # noinspection PyMethodMayBeStatic
+    def _build_method_parse_result(self, node: Node) -> MethodParseResult:
+        method = MethodParseResult()
+        if node.children[0].type == "modifiers":
+            method.modifiers = node.children[0].text.decode('utf-8')
+        name_node = node.child_by_field_name('name')
+        if name_node:
+            method.name = name_node.text.decode('utf-8')
+        parameters_node = node.child_by_field_name('parameters')
+        if parameters_node:
+            method.parameters = parameters_node.text.decode('utf-8')
+        type_node = node.child_by_field_name('type')
+        if type_node:
+            method.type = type_node.text.decode('utf-8')
+        type_parameters_node = node.child_by_field_name('type_parameters')
+        if type_parameters_node:
+            method.type = type_parameters_node.text.decode('utf-8')
+        throws_node = node.child_by_field_name('throws')
+        if throws_node:
+            method.type = throws_node.text.decode('utf-8')
+        return method
+
+    # noinspection PyMethodMayBeStatic
+    def _build_import_import_result(self, import_text: str) -> ImportParseResult:
+        import_result = ImportParseResult()
+        import_text = import_text.strip()
+        if import_text.endswith(";"):
+            import_text = import_text[:-1].strip()
+        if "import" in import_text:
+            import_text = import_text.replace("import", "").strip()
+        parts = import_text.split(".")
+        if len(parts) > 1:
+            import_result.package = ".".join(parts[:-1])
+            import_result.class_name = parts[-1]
+        else:
+            import_result.package = None
+            import_result.class_name = parts[0]
+        return import_result
+
+
 def path_to_class_name(path: str) -> str:
     return Path(path).stem
 
 
-def import_to_package_and_class_name(import_statement: str) -> str:
+def import_to_package_and_class_name(import_statement: str) -> tuple[str, str]:
     clean_import = import_statement.replace("import", "").replace(";", "").strip()
     parts = clean_import.split(".")
     return ".".join(parts[:-1]), parts[-1]

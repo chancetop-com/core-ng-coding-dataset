@@ -6,6 +6,27 @@ from typing import List, Dict, Any, Optional
 from elasticsearch import Elasticsearch
 
 
+class ActionDocumentContextController:
+    def __init__(self, controller: str):
+        self.controller = controller
+
+    def get_package(self) -> Optional[str]:
+        if not self.controller:
+            return None
+        splits = self.controller.split(".")[:-2]
+        return ".".join(splits)
+
+    def get_class_name(self) -> Optional[str]:
+        if not self.controller:
+            return None
+        return self.controller.split(".")[-2]
+
+    def get_method_name(self) -> Optional[str]:
+        if not self.controller:
+            return None
+        return self.controller.split(".")[-1]
+
+
 class ActionDocument:
     def __init__(self, source_doc: Dict[str, Any]):
         timestamp_str = source_doc.get("@timestamp")
@@ -29,27 +50,12 @@ class ActionDocument:
         self.stats: Dict[str, float] = source_doc.get("stats", {})
         self.performance_stats: Dict[str, Any] = source_doc.get("perf_stats", {})
 
-    def get_context_controller_package(self):
-        controllers = self.context.get("controller")
-        if controllers is None or len(controllers) == 0:
-            return None
-        controller = controllers[0]
-        splits = controller.split(".")[:-2]
-        return ".".join(splits)
+    def get_context_controller(self) -> ActionDocumentContextController:
+        controller = self.context.get("controller", [])
+        if not controller:
+            return ActionDocumentContextController("")
+        return ActionDocumentContextController(controller[0])
 
-    def get_context_controller_class_name(self):
-        controllers = self.context.get("controller")
-        if controllers is None or len(controllers) == 0:
-            return None
-        controller = controllers[0]
-        return controller.split(".")[-2]
-
-    def get_context_controller_method_name(self):
-        controllers = self.context.get("controller")
-        if controllers is None or len(controllers) == 0:
-            return None
-        controller = controllers[0]
-        return controller.split(".")[-1]
 
     def __repr__(self) -> str:
         return f"ActionDocument(id={self.id}, action={self.action})"
@@ -85,7 +91,7 @@ class ActionTraces:
             return ActionDocument(result["hits"]["hits"][0]["_source"])
         return None
 
-    def _fetch_correlation_documents(self, correlation_id: str) -> List[ActionDocument]:
+    def _fetch_correlation_documents(self, correlation_id: List[str]) -> List[ActionDocument]:
         es = self._connect()
         query = {
             "query": {
