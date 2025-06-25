@@ -1,6 +1,14 @@
+# @author: stephen
+
 import fire
-from library.java_parser import JavaParser, JavaFieldParser
+from library.java_parser import JavaParser
 from library.repo_java_parser import RepoJavaParser
+from library.action_trace import ActionTraces
+
+
+def trace(action: str) -> None:
+    parser = ActionTraces(action)
+    parser.print_traces()
 
 
 def parse_file(file_path: str) -> str:
@@ -23,5 +31,6 @@ if __name__ == "__main__":
     fire.Fire({
         "repo": parse_repo,
         "file": parse_file,
-        "find": find_reference
+        "find": find_reference,
+        "trace": trace
     })

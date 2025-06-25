@@ -128,6 +128,37 @@ class ActionTraces:
                 return doc
         return None
 
+    def walk(self, size: Optional[int] = None):
+        if not self.docs:
+            return
+
+        root_doc = self.get_root_doc()
+        if not root_doc:
+            return
+
+        children_map: Dict[str, List[ActionDocument]] = {doc.id: [] for doc in self.docs}
+        for doc in self.docs:
+            for parent_id in doc.ref_ids:
+                if parent_id in children_map:
+                    children_map[parent_id].append(doc)
+
+        count = 0
+
+        def dfs(node: ActionDocument):
+            nonlocal count
+            if size is not None and count >= size:
+                return
+            yield node
+            count += 1
+            if size is not None and count >= size:
+                return
+            for child in children_map.get(node.id, []):
+                yield from dfs(child)
+                if size is not None and count >= size:
+                    break
+
+        yield from dfs(root_doc)
+
     def print_traces(self):
         if not self.docs:
             return

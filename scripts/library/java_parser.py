@@ -129,6 +129,12 @@ class JavaParseResult:
         for i in self.imports:
             if i.class_name == class_name:
                 return i
+        for i in self.implicit_imports:
+            if i == class_name:
+                imp = ImportParseResult()
+                imp.class_name = i
+                imp.package = self.package
+                return imp
         return None
 
     def is_import_class(self, package: str, class_name: str) -> bool:
