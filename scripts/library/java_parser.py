@@ -18,6 +18,15 @@ JAVA_LANG_CLASSES = {
 JAVA_PRIMITIVE_TYPES = {"byte", "short", "int", "long", "float", "double", "boolean", "char", "void", "var"}
 
 
+class MethodBodyParseResult:
+    def __init__(self):
+        self.body: str = ""
+        self.references: list[str] = []
+
+    def __repr__(self):
+        return f"MethodBodyParseResult(body={self.body}, references={self.references})"
+
+
 class MethodParseResult:
     def __init__(self):
         self.name: str = ""
@@ -116,14 +125,150 @@ class JavaParseResult:
         self.implicit_imports: list[str] = []
         self.classes: list[ClassParseResult] = []
     
-    def get_import_by_class_name(self, class_name: str):
+    def get_import_by_class_name(self, class_name: str) -> ImportParseResult | None:
         for i in self.imports:
             if i.class_name == class_name:
                 return i
         return None
-    
-    def __repr__(self):
-        return f"JavaParseResult(path='{self.path}', package='{self.package}', classes={self.classes})"
+
+    def is_import_class(self, package: str, class_name: str) -> bool:
+        for imp in self.imports:
+            if imp.package == package and imp.class_name == class_name:
+                return True
+        return False
+
+    def get_class_by_name(self, class_name: str) -> ClassParseResult | None:
+        for cls in self.classes:
+            if cls.name == class_name:
+                return cls
+        return None
+
+    def get_method_by_name(self, class_name: str, method_name: str) -> MethodParseResult | None:
+        cls = self.get_class_by_name(class_name)
+        if cls:
+            return cls.get_method_by_name(method_name)
+        return None
+
+    def get_superclass_of_class(self, class_name: str) -> str:
+        cls = self.get_class_by_name(class_name)
+        return cls.superclass.split(" ")[-1] if cls and cls.superclass else ""
+
+    def get_interface_of_class(self, class_name: str) -> str:
+        cls = self.get_class_by_name(class_name)
+        return cls.interfaces.split(" ")[-1] if cls and cls.interfaces else ""
+
+    def _get_method_signature_references(self, class_name: str, method_name: str) -> list[ImportParseResult]:
+        method = self.get_method_by_name(class_name, method_name)
+        references = []
+        for imp in self.imports:
+            if imp.class_name == method.type or imp.class_name in method.parameters:
+                references.append(imp)
+        return references
+
+    def get_method_body(self, class_name: str, method_name: str) -> MethodBodyParseResult:
+        parser = JavaBodyParser(self.path)
+        return parser.parse(class_name, method_name)
+
+    def _get_method_body_references(self, class_name: str, method_name: str) -> list[ImportParseResult]:
+        body = self.get_method_body(class_name, method_name)
+        types = set([i.class_name for i in self.imports] + [i for i in self.implicit_imports])
+        field_types = {}
+        for f in self.get_class_by_name(class_name).fields:
+            field_types[f.declarator] = f.type
+        references = []
+        for ref in body.references:
+            if ref in types:
+                import_result = self.get_import_by_class_name(ref)
+                if import_result:
+                    references.append(import_result)
+            if ref in field_types:
+                field_type = field_types[ref]
+                import_result = self.get_import_by_class_name(field_type)
+                if import_result:
+                    references.append(import_result)
+        return references
+
+    def get_method_references(self, class_name: str, method_name: str) -> list[ImportParseResult]:
+        """
+        Get all imports that are used in a method's signature or body.
+
+        Args:
+            class_name: The name of the class containing the method
+            method_name: The name of the method to analyze
+
+        Returns:
+            A list of ImportParseResult objects that are used in the method
+        """
+        signature_references = self._get_method_signature_references(class_name, method_name)
+        body_references = self._get_method_body_references(class_name, method_name)
+        references = set(signature_references + body_references)
+        references = [ref for ref in references if not ref.package.startswith("core.framework")]
+        return references
+
+
+class JavaBodyParser:
+    def __init__(self, path: str):
+        self.result = None
+        self.parser = Parser(LANGUAGE)
+        self.path = path
+
+
+    def parse(self, class_name: str, method_name: str) -> MethodBodyParseResult:
+        if self.result is not None: return self.result
+
+        self.result = MethodBodyParseResult()
+
+        try:
+            with open(self.path, "rb") as file:
+                source_bytes = file.read()
+        except FileNotFoundError:
+            print(f"Error: File not found at {self.path}")
+            return self.result
+        except Exception as e:
+            print(f"Error reading file: {e}")
+            return self.result
+
+        tree = self.parser.parse(source_bytes)
+        root_node = tree.root_node
+
+        method_node = self._find_method_node(root_node, class_name, method_name)
+        if not method_node:
+            return self.result
+
+        body_node = method_node.child_by_field_name("body")
+        if body_node:
+            self.result.body = body_node.text.decode('utf-8')
+            self._collect_identifier_and_type_identifier(body_node, self.result.references)
+
+        return self.result
+
+    # noinspection PyMethodMayBeStatic
+    def _collect_identifier_and_type_identifier(self, node, refs):
+        if node.type == "type_identifier" or node.type == "identifier":
+            type_name = node.text.decode("utf-8")
+            if type_name not in refs:
+                refs.append(type_name)
+        for child in node.children:
+            self._collect_identifier_and_type_identifier(child, refs)
+
+
+    def _find_method_node(self, node, class_name: str, method_name: str, current_class=None):
+        if node.type in (
+                "class_declaration", "interface_declaration",
+                "enum_declaration", "record_declaration", "annotation_type_declaration"
+        ):
+            name_node = node.child_by_field_name('name')
+            if name_node:
+                current_class = name_node.text.decode('utf-8')
+        if node.type == "method_declaration" and current_class == class_name:
+            name_node = node.child_by_field_name('name')
+            if name_node and name_node.text.decode('utf-8') == method_name:
+                return node
+        for child in node.children:
+            result = self._find_method_node(child, class_name, method_name, current_class)
+            if result:
+                return result
+        return None
 
 
 class JavaFieldParser:

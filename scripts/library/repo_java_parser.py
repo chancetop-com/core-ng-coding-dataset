@@ -31,9 +31,13 @@ class RepoJavaParser:
     
     def _load(self) -> None:
         """Load parsed results from JSON file."""
+        print(f"Loading parsed results from {self.output_path}...")
+
         with open(self.output_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        
+
+        print(f"Success loaded: {len(data)} files found")
+
         for path, file_data in data.items():
             result = JavaParseResult()
             result.path = path
@@ -89,6 +93,8 @@ class RepoJavaParser:
     
     def _parse(self) -> None:
         """Parse all Java files in the repository."""
+        print(f"Parsed ast not found, parsing Java files in {self.repo_path}...")
+
         java_files = list(self.repo_path.rglob('*.java'))
 
         for java_file in tqdm(java_files, desc="Parsing Java files", unit="file"):
@@ -119,7 +125,7 @@ class RepoJavaParser:
     def _filter_imports(self) -> None:
         packages = {j.package for j in self.result.values() if j.package}
         for result in self.result.values():
-            result.imports = [imp for imp in result.imports if imp.package in packages]
+            result.imports = [imp for imp in result.imports if imp.package in packages or imp.package.startswith("core.framework")]
 
 
     # noinspection PyMethodMayBeStatic
@@ -140,7 +146,30 @@ class RepoJavaParser:
 
         return None
 
-    def find_references_by_imports(self, package: str, class_name: str) -> list[JavaParseResult]:
+    def find_app_or_module_of_class(self, package: str, class_name: str) -> Optional[JavaParseResult]:
+        apps = self.find_references("core.framework.module", "App")
+        modules = self.find_references("core.framework.module", "Module")
+        for app in apps:
+            if app.is_import_class(package, class_name):
+                return app
+        for module in modules:
+            if module.is_import_class(package, class_name):
+                return module
+        return None
+
+    def find_class_superclass(self, package: str, class_name: str) -> Optional[JavaParseResult]:
+        rst = self.find(package, class_name)
+        clz = rst.get_superclass_of_class(class_name)
+        imp = rst.get_import_by_class_name(clz)
+        return self.find(imp.package, imp.class_name) if imp else None
+
+    def find_class_interface(self, package: str, class_name: str) -> Optional[JavaParseResult]:
+        rst = self.find(package, class_name)
+        clz = rst.get_interface_of_class(class_name)
+        imp = rst.get_import_by_class_name(clz)
+        return self.find(imp.package, imp.class_name) if imp else None
+
+    def _find_references_by_imports(self, package: str, class_name: str) -> list[JavaParseResult]:
         references = []
         for result in self.result.values():
             for i in result.imports:
@@ -149,7 +178,7 @@ class RepoJavaParser:
                     break
         return references
 
-    def find_references_by_implicit_imports(self, package: str, class_name: str) -> list[JavaParseResult]:
+    def _find_references_by_implicit_imports(self, package: str, class_name: str) -> list[JavaParseResult]:
         references = []
         for result in self.result.values():
             if result.package == package:
@@ -158,5 +187,5 @@ class RepoJavaParser:
         return references
 
     def find_references(self, package: str, class_name: str) -> list[JavaParseResult]:
-        return (self.find_references_by_imports(package, class_name) +
-                self.find_references_by_implicit_imports(package, class_name))
+        return (self._find_references_by_imports(package, class_name) +
+                self._find_references_by_implicit_imports(package, class_name))
