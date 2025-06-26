@@ -1,5 +1,6 @@
 # @author: stephen
 
+import re
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -23,12 +24,32 @@ class RepoJavaParser:
             
         self.output_path = output_path or str(self.repo_path / 'ast.json')
         self.result: Dict[str, JavaParseResult] = {}
-        
+
+        self.apps = self._parse_all_apps(repo_path)
         if not reparse and Path(self.output_path).exists():
             self._load()
         else:
             self._parse()
-    
+
+    # noinspection PyMethodMayBeStatic
+    def _parse_all_apps(self, repo_path: str) -> list[str]:
+        apps = []
+        dockerfiles = Path(repo_path).rglob('docker/Dockerfile')
+
+        for path in dockerfiles:
+            try:
+                with path.open('r', encoding='utf-8') as f:
+                    for line in f:
+                        match = re.search(r'LABEL\s+app=(\S+)', line)
+                        if match:
+                            apps.append(match.group(1))
+                            break
+            except IOError as e:
+                print(f"Error reading file {path}: {e}")
+
+        print(f"Found {len(apps)} apps: {apps}")
+        return apps
+
     def _load(self) -> None:
         """Load parsed results from JSON file."""
         print(f"Loading parsed results from {self.output_path}...")

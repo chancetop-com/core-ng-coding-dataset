@@ -3,12 +3,17 @@
 import fire
 from library.java_parser import JavaParser
 from library.repo_java_parser import RepoJavaParser
-from library.action_trace import ActionTraces
+from library.action_trace import ActionTraces, RecentActions
 
 
-def trace(action: str) -> None:
+def fetch_recent_traces(size: int = 10, path: str = None) -> None:
+    actions = RecentActions(size, path=path)
+    actions.print_recent_actions()
+
+
+def trace(action: str) -> str:
     parser = ActionTraces(action)
-    parser.print_traces()
+    return str(parser)
 
 
 def parse_file(file_path: str) -> str:
@@ -32,5 +37,6 @@ if __name__ == "__main__":
         "repo": parse_repo,
         "file": parse_file,
         "find": find_reference,
-        "trace": trace
+        "trace": trace,
+        "recent": fetch_recent_traces
     })

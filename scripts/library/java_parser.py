@@ -211,6 +211,24 @@ class JavaParseResult:
         references = [ref for ref in references if not ref.package.startswith("core.framework")]
         return references
 
+    def get_implicit_imports(self) -> list[ImportParseResult]:
+        """
+        Get all implicit imports that are not explicitly imported but are used in the code.
+
+        Returns:
+            A list of ImportParseResult objects for implicit imports
+        """
+        implicit_imports = []
+        for imp in self.implicit_imports:
+            import_result = ImportParseResult()
+            import_result.class_name = imp
+            import_result.package = self.package
+            implicit_imports.append(import_result)
+        return implicit_imports
+
+    def get_references(self) -> list[ImportParseResult]:
+        return [imp for imp in self.imports + self.get_implicit_imports() if not imp.package.startswith("core.framework")]
+
 
 class JavaBodyParser:
     def __init__(self, path: str):

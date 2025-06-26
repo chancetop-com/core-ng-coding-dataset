@@ -143,7 +143,7 @@ def file2qa(repo_parser: RepoJavaParser, target_file_path: str, prompt_template:
     It builds the context, generates the Q&A, and saves it to a .json file.
 
     Args:
-        repo_path: The root path of the repository.
+        repo_parser: The repository parser object that contains the parsed Java files.
         target_file_path: The absolute path to the target .java file.
         rst_path: The path where the generated Q&A will be saved as a JSON file.
         prompt_template: The template used to format the prompt for the LLM.
