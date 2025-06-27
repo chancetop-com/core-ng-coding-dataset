@@ -1,0 +1,2004 @@
+{
+    "actions": [
+        {
+            "action": "api:get:/store",
+            "count": 170434
+        },
+        {
+            "action": "api:put:/bo/auth/activate",
+            "count": 67322
+        },
+        {
+            "action": "api:get:/kiosk-app/branding",
+            "count": 48695
+        },
+        {
+            "action": "api:get:/kiosk-app/:id",
+            "count": 48611
+        },
+        {
+            "action": "job:adjust-channel-access-job",
+            "count": 42371
+        },
+        {
+            "action": "topic:adjust-channel-access-request",
+            "count": 42368
+        },
+        {
+            "action": "job:reactive-temporarily-closed-location-job",
+            "count": 42366
+        },
+        {
+            "action": "topic:reactive-temporarily-closed-location",
+            "count": 42363
+        },
+        {
+            "action": "api:get:/location/:id/undeleted",
+            "count": 30583
+        },
+        {
+            "action": "api:get:/ajax/alert/active-count",
+            "count": 24519
+        },
+        {
+            "action": "api:get:/ajax/alert/list-active",
+            "count": 24417
+        },
+        {
+            "action": "http:post:/event/:app",
+            "count": 24346
+        },
+        {
+            "action": "api:get:/mobile-app/:id/eff",
+            "count": 12284
+        },
+        {
+            "action": "api:get:/tableside/:id",
+            "count": 12129
+        },
+        {
+            "action": "api:put:/order",
+            "count": 11857
+        },
+        {
+            "action": "api:get:/bo/location/:id",
+            "count": 11725
+        },
+        {
+            "action": "api:get:/order/need-action-count",
+            "count": 11382
+        },
+        {
+            "action": "api:get:/location",
+            "count": 11379
+        },
+        {
+            "action": "api:get:/order/:id",
+            "count": 10952
+        },
+        {
+            "action": "api:get:/bo/order/:id",
+            "count": 10881
+        },
+        {
+            "action": "api:put:/location/list",
+            "count": 9977
+        },
+        {
+            "action": "api:put:/order/count-by-statuses",
+            "count": 9751
+        },
+        {
+            "action": "api:put:/bo/order/search-by-location",
+            "count": 9667
+        },
+        {
+            "action": "api:put:/bo/order",
+            "count": 9644
+        },
+        {
+            "action": "api:get:/bo/merchant/:id",
+            "count": 9405
+        },
+        {
+            "action": "api:put:/bo/location/printer/bulk-get",
+            "count": 9222
+        },
+        {
+            "action": "api:put:/ajax/order",
+            "count": 9142
+        },
+        {
+            "action": "api:get:/bo/merchant/:merchantId/payment-gateway",
+            "count": 8798
+        },
+        {
+            "action": "api:get:/location/:id/info",
+            "count": 5962
+        },
+        {
+            "action": "topic:order-notification",
+            "count": 4487
+        },
+        {
+            "action": "api:get:/loyalty/program/:id",
+            "count": 3150
+        },
+        {
+            "action": "topic:operation-assistant-chat-event",
+            "count": 2589
+        },
+        {
+            "action": "api:get:/cart",
+            "count": 2533
+        },
+        {
+            "action": "api:get:/loyalty/point-name",
+            "count": 2401
+        },
+        {
+            "action": "api:get:/bo/store/:merchantId",
+            "count": 1710
+        },
+        {
+            "action": "api:get:/bo/tableside/:id",
+            "count": 1677
+        },
+        {
+            "action": "api:put:/location/:id/available",
+            "count": 1624
+        },
+        {
+            "action": "api:put:/bo/location",
+            "count": 1399
+        },
+        {
+            "action": "api:put:/menu",
+            "count": 1383
+        },
+        {
+            "action": "api:put:/menu/products",
+            "count": 1372
+        },
+        {
+            "action": "api:put:/ajax/location",
+            "count": 1352
+        },
+        {
+            "action": "sse:/mcp:close",
+            "count": 1286
+        },
+        {
+            "action": "sse:/mcp:connect",
+            "count": 1286
+        },
+        {
+            "action": "sse:/mcp:connect:task:close-finished-channel",
+            "count": 1284
+        },
+        {
+            "action": "api:put:/location/:id/item-inventory/bulk-get",
+            "count": 1224
+        },
+        {
+            "action": "api:put:/payment-customer/get-or-create",
+            "count": 1212
+        },
+        {
+            "action": "http:post:/webhook",
+            "count": 1142
+        },
+        {
+            "action": "http:post:/webhook:task:handle-webhook",
+            "count": 1142
+        },
+        {
+            "action": "topic:product-notification",
+            "count": 1085
+        },
+        {
+            "action": "api:get:/stripe-connect/account/:id:task:track-stripe-api",
+            "count": 1080
+        },
+        {
+            "action": "api:put:/product/list-by-ids",
+            "count": 1037
+        },
+        {
+            "action": "sse:/sse/operation-assistant/chat:close",
+            "count": 1036
+        },
+        {
+            "action": "sse:/sse/operation-assistant/chat:connect",
+            "count": 1036
+        },
+        {
+            "action": "api:post:/operation-assistant/chat-sse",
+            "count": 1035
+        },
+        {
+            "action": "api:post:/operation-assistant/chat-sse:task:chat",
+            "count": 1035
+        },
+        {
+            "action": "api:get:/bo/user/:id",
+            "count": 1005
+        },
+        {
+            "action": "api:get:/merchant/:merchantId/payment-gateway",
+            "count": 1004
+        },
+        {
+            "action": "api:get:/ajax/cart",
+            "count": 955
+        },
+        {
+            "action": "api:put:/product",
+            "count": 875
+        },
+        {
+            "action": "api:get:/payment-platform/account/:accountId",
+            "count": 851
+        },
+        {
+            "action": "api:put:/bo/merchant/bulk-get",
+            "count": 822
+        },
+        {
+            "action": "api:put:/bo/tenant/bulk-get",
+            "count": 791
+        },
+        {
+            "action": "api:get:/ajax/subscription/service/will-end",
+            "count": 777
+        },
+        {
+            "action": "api:get:/bo/subscription/service/will-end",
+            "count": 777
+        },
+        {
+            "action": "api:get:/product/:id",
+            "count": 764
+        },
+        {
+            "action": "api:get:/merchant/:id",
+            "count": 738
+        },
+        {
+            "action": "api:get:/ajax/user/identity",
+            "count": 723
+        },
+        {
+            "action": "api:put:/ajax/product",
+            "count": 717
+        },
+        {
+            "action": "job:auto-complete-order-job",
+            "count": 707
+        },
+        {
+            "action": "job:deliverect-refresh-location-opening-hour-job",
+            "count": 707
+        },
+        {
+            "action": "job:mark-alert-as-resolved-job",
+            "count": 707
+        },
+        {
+            "action": "job:mark-alert-as-resolved-job:task:mark-alert-as-resolved",
+            "count": 707
+        },
+        {
+            "action": "topic:auto-complete-order-request",
+            "count": 707
+        },
+        {
+            "action": "topic:deliverect-refresh-location-opening-hour-request",
+            "count": 707
+        },
+        {
+            "action": "api:get:/customer-setting/:customerId",
+            "count": 667
+        },
+        {
+            "action": "api:put:/ajax/offering-setting",
+            "count": 648
+        },
+        {
+            "action": "api:get:/bo/tenant/subscription",
+            "count": 632
+        },
+        {
+            "action": "api:put:/bo/offering-setting",
+            "count": 632
+        },
+        {
+            "action": "api:put:/bo/tenant/subscription",
+            "count": 632
+        },
+        {
+            "action": "api:put:/bo/menu/product",
+            "count": 598
+        },
+        {
+            "action": "api:put:/bo/tax",
+            "count": 585
+        },
+        {
+            "action": "api:put:/ajax/tax",
+            "count": 583
+        },
+        {
+            "action": "api:get:/bo/category",
+            "count": 576
+        },
+        {
+            "action": "api:get:/ajax/location",
+            "count": 560
+        },
+        {
+            "action": "api:get:/bo/location/list",
+            "count": 558
+        },
+        {
+            "action": "api:get:/stripe-connect/account/:id",
+            "count": 540
+        },
+        {
+            "action": "api:get:/alert/list-active",
+            "count": 526
+        },
+        {
+            "action": "api:get:/loyalty/account/get-by-customer-id",
+            "count": 520
+        },
+        {
+            "action": "api:get:/alert/active-count",
+            "count": 512
+        },
+        {
+            "action": "api:get:/bo/user/get-by-email",
+            "count": 485
+        },
+        {
+            "action": "api:get:/ajax/merchant/:id",
+            "count": 477
+        },
+        {
+            "action": "api:get:/ajax/category",
+            "count": 474
+        },
+        {
+            "action": "api:get:/report/location/:locationId/dashboard-overview",
+            "count": 465
+        },
+        {
+            "action": "api:get:/bo/location/:locationId/item-price/sales-channel",
+            "count": 446
+        },
+        {
+            "action": "topic:operation-assistant-chat-event:task:close-finished-channel",
+            "count": 443
+        },
+        {
+            "action": "api:put:/bo/menu",
+            "count": 438
+        },
+        {
+            "action": "api:put:/bo/product",
+            "count": 415
+        },
+        {
+            "action": "api:put:/location/refresh",
+            "count": 410
+        },
+        {
+            "action": "api:put:/loyalty/reward-tier",
+            "count": 399
+        },
+        {
+            "action": "api:put:/ajax/session/refresh-location",
+            "count": 373
+        },
+        {
+            "action": "api:get:/customer/:id",
+            "count": 358
+        },
+        {
+            "action": "api:put:/menu/upsert",
+            "count": 352
+        },
+        {
+            "action": "topic:pos-location-menu-upserted",
+            "count": 340
+        },
+        {
+            "action": "topic:batch-product-upserted",
+            "count": 334
+        },
+        {
+            "action": "api:get:/bo/menu",
+            "count": 304
+        },
+        {
+            "action": "api:put:/ajax/location/:locationId/menu/product",
+            "count": 295
+        },
+        {
+            "action": "api:get:/loyalty/point-event/earned-points",
+            "count": 291
+        },
+        {
+            "action": "api:get:/ajax/order/:id",
+            "count": 286
+        },
+        {
+            "action": "api:put:/subscription/service/check-by-merchant",
+            "count": 286
+        },
+        {
+            "action": "api:get:/mobile-app/version",
+            "count": 285
+        },
+        {
+            "action": "api:get:/version",
+            "count": 285
+        },
+        {
+            "action": "api:post:/guest",
+            "count": 280
+        },
+        {
+            "action": "api:put:/session/refresh-location",
+            "count": 280
+        },
+        {
+            "action": "api:get:/mobile-app",
+            "count": 279
+        },
+        {
+            "action": "api:put:/location/:id/order-eta/calculate",
+            "count": 277
+        },
+        {
+            "action": "api:post:/order",
+            "count": 271
+        },
+        {
+            "action": "api:get:/loyalty/reward-tier/:id",
+            "count": 270
+        },
+        {
+            "action": "api:get:/ajax/customer/profile",
+            "count": 269
+        },
+        {
+            "action": "api:get:/ajax/location/:locationId/detail",
+            "count": 269
+        },
+        {
+            "action": "api:get:/merchant/:fbrMerchantId/pos/check-pos-merchant",
+            "count": 265
+        },
+        {
+            "action": "api:get:/ajax/location/:locationId/menu",
+            "count": 263
+        },
+        {
+            "action": "api:get:/bo/location/:locationId/item-tax/sales-channel",
+            "count": 261
+        },
+        {
+            "action": "api:get:/loyalty/reward-tier/applied",
+            "count": 256
+        },
+        {
+            "action": "api:get:/customer/:id/payment-method/default/optional",
+            "count": 253
+        },
+        {
+            "action": "api:get:/ajax/store/merchant",
+            "count": 249
+        },
+        {
+            "action": "api:put:/bo/location/bulk-get",
+            "count": 244
+        },
+        {
+            "action": "api:get:/customer/:id/payment-method/card",
+            "count": 239
+        },
+        {
+            "action": "api:delete:/cart",
+            "count": 230
+        },
+        {
+            "action": "api:put:/cart-item",
+            "count": 230
+        },
+        {
+            "action": "topic:deliverect-crawler-request:task:get-items",
+            "count": 224
+        },
+        {
+            "action": "api:get:/merchant/pos/:posMerchantId",
+            "count": 223
+        },
+        {
+            "action": "http:get:/",
+            "count": 220
+        },
+        {
+            "action": "api:get:/loyalty/account",
+            "count": 215
+        },
+        {
+            "action": "api:get:/store/fulfillment",
+            "count": 207
+        },
+        {
+            "action": "api:put:/ajax/location/:id/available",
+            "count": 207
+        },
+        {
+            "action": "api:get:/ajax/product/:id",
+            "count": 195
+        },
+        {
+            "action": "topic:deliverect-crawler-publish-menu-request:task:get-items",
+            "count": 195
+        },
+        {
+            "action": "api:put:/ajax/checkout/check",
+            "count": 184
+        },
+        {
+            "action": "api:get:/bo/printer",
+            "count": 182
+        },
+        {
+            "action": "api:get:/mobile-app/fulfillment",
+            "count": 178
+        },
+        {
+            "action": "api:put:/ajax/menu",
+            "count": 177
+        },
+        {
+            "action": "api:post:/bo/auth",
+            "count": 172
+        },
+        {
+            "action": "api:put:/bo/user/login",
+            "count": 172
+        },
+        {
+            "action": "api:get:/loyalty/point-expiration/get-latest-by-account-id",
+            "count": 170
+        },
+        {
+            "action": "api:get:/bo/user/:id/role",
+            "count": 165
+        },
+        {
+            "action": "api:put:/bo/permission-set/permission/bulk-get",
+            "count": 165
+        },
+        {
+            "action": "api:put:/bo/permission/bulk-get",
+            "count": 165
+        },
+        {
+            "action": "api:put:/bo/role/permission/bulk-get",
+            "count": 165
+        },
+        {
+            "action": "api:put:/bo/tenant/subscription/bulk-get",
+            "count": 165
+        },
+        {
+            "action": "api:get:/cart/applicable-reward-tier",
+            "count": 160
+        },
+        {
+            "action": "topic:location-status-updated",
+            "count": 159
+        },
+        {
+            "action": "api:get:/customer/:id/address",
+            "count": 155
+        },
+        {
+            "action": "api:put:/ajax/user/login",
+            "count": 154
+        },
+        {
+            "action": "api:get:/bo/menu/:id",
+            "count": 153
+        },
+        {
+            "action": "api:get:/customer/address",
+            "count": 146
+        },
+        {
+            "action": "api:put:/ajax/modifier",
+            "count": 146
+        },
+        {
+            "action": "api:put:/bo/modifier",
+            "count": 146
+        },
+        {
+            "action": "api:get:/customer/profile",
+            "count": 141
+        },
+        {
+            "action": "api:put:/checkout/calculate",
+            "count": 140
+        },
+        {
+            "action": "api:get:/customer/payment-method",
+            "count": 138
+        },
+        {
+            "action": "api:put:/location/:id/item-tax/bulk-get",
+            "count": 137
+        },
+        {
+            "action": "api:put:/location",
+            "count": 133
+        },
+        {
+            "action": "api:put:/product/location",
+            "count": 133
+        },
+        {
+            "action": "api:get:/customer-setting",
+            "count": 132
+        },
+        {
+            "action": "api:put:/modifier-group/modifier-option/list",
+            "count": 125
+        },
+        {
+            "action": "api:post:/payment/saved-method",
+            "count": 122
+        },
+        {
+            "action": "api:put:/order/search-by-customer",
+            "count": 121
+        },
+        {
+            "action": "api:post:/session",
+            "count": 118
+        },
+        {
+            "action": "api:put:/loyalty/reward-tier/check",
+            "count": 118
+        },
+        {
+            "action": "api:put:/alert/mark-as-resolved-by-job",
+            "count": 117
+        },
+        {
+            "action": "api:get:/ajax/menu/:id",
+            "count": 116
+        },
+        {
+            "action": "api:put:/ajax/alert",
+            "count": 115
+        },
+        {
+            "action": "api:put:/checkout/preview",
+            "count": 111
+        },
+        {
+            "action": "api:put:/checkout/check",
+            "count": 108
+        },
+        {
+            "action": "api:get:/bo/merchant/:fbrMerchantId/location",
+            "count": 107
+        },
+        {
+            "action": "api:put:/ajax/daily-operation/dashboard/location/:id/products",
+            "count": 107
+        },
+        {
+            "action": "api:get:/store/:id",
+            "count": 105
+        },
+        {
+            "action": "api:post:/fcm/order/notification",
+            "count": 105
+        },
+        {
+            "action": "api:put:/order/:id/payment",
+            "count": 105
+        },
+        {
+            "action": "topic:location-updated",
+            "count": 105
+        },
+        {
+            "action": "api:get:/ajax/customer/payment-method",
+            "count": 104
+        },
+        {
+            "action": "api:get:/customer/check-exist",
+            "count": 103
+        },
+        {
+            "action": "api:post:/ajax/cart-item",
+            "count": 103
+        },
+        {
+            "action": "api:get:/ajax/printer",
+            "count": 102
+        },
+        {
+            "action": "api:put:/ajax/checkout",
+            "count": 101
+        },
+        {
+            "action": "api:get:/ajax/daily-operation/dashboard/:id",
+            "count": 99
+        },
+        {
+            "action": "api:put:/bo/order/statistics",
+            "count": 99
+        },
+        {
+            "action": "api:put:/tenant/subscription/service",
+            "count": 99
+        },
+        {
+            "action": "api:get:/oauth/payment-platform",
+            "count": 97
+        },
+        {
+            "action": "api:post:/file",
+            "count": 97
+        },
+        {
+            "action": "api:put:/customer/sms-verification-code/verify",
+            "count": 90
+        },
+        {
+            "action": "api:get:/location/:locationId",
+            "count": 89
+        },
+        {
+            "action": "api:get:/ajax/location/aggregation",
+            "count": 87
+        },
+        {
+            "action": "http:get:/robots.txt",
+            "count": 87
+        },
+        {
+            "action": "topic:batch-modifier-group-upserted",
+            "count": 86
+        },
+        {
+            "action": "api:post:/customer/sms-verification-code",
+            "count": 84
+        },
+        {
+            "action": "api:put:/cart-item/:id/quantity",
+            "count": 84
+        },
+        {
+            "action": "api:put:/bo/order/:id/status",
+            "count": 83
+        },
+        {
+            "action": "api:post:/cart-item",
+            "count": 80
+        },
+        {
+            "action": "api:get:/ajax/item/:id",
+            "count": 77
+        },
+        {
+            "action": "api:get:/bo/item/:id",
+            "count": 77
+        },
+        {
+            "action": "api:get:/ajax/phone/:phone/verify",
+            "count": 75
+        },
+        {
+            "action": "api:put:/location/:id/setting/item",
+            "count": 75
+        },
+        {
+            "action": "api:get:/bo/:id/loyalty-program",
+            "count": 74
+        },
+        {
+            "action": "api:get:/ajax/loyalty-program",
+            "count": 73
+        },
+        {
+            "action": "api:get:/ajax/merchant/sale-channels",
+            "count": 73
+        },
+        {
+            "action": "api:get:/merchant/:id/sales-channel",
+            "count": 73
+        },
+        {
+            "action": "api:get:/printer",
+            "count": 73
+        },
+        {
+            "action": "api:get:/cart-item/latest",
+            "count": 70
+        },
+        {
+            "action": "api:put:/bo/location/:locationId/item/:itemId/inventory",
+            "count": 70
+        },
+        {
+            "action": "api:put:/bo/menu/:id:task:update-location-setting-item",
+            "count": 70
+        },
+        {
+            "action": "topic:deliverect-crawler-publish-menu-request",
+            "count": 70
+        },
+        {
+            "action": "api:put:/device/messaging-token",
+            "count": 69
+        },
+        {
+            "action": "api:get:/merchant/:fbrMerchantId/pos/:platform/pos-merchant",
+            "count": 68
+        },
+        {
+            "action": "api:put:/ajax/report/order/top-ten-revenue-of-locations",
+            "count": 68
+        },
+        {
+            "action": "api:put:/bo/report/order/top-ten-revenue-of-locations",
+            "count": 68
+        },
+        {
+            "action": "api:get:/kiosk-app/fulfillment",
+            "count": 65
+        },
+        {
+            "action": "api:put:/location/inventory/products",
+            "count": 65
+        },
+        {
+            "action": "api:get:/ajax/alert/:id",
+            "count": 64
+        },
+        {
+            "action": "api:get:/ajax/store",
+            "count": 64
+        },
+        {
+            "action": "api:post:/ajax/order",
+            "count": 64
+        },
+        {
+            "action": "api:get:/customer/address/:addressId",
+            "count": 63
+        },
+        {
+            "action": "topic:deliverect-crawler-request:task:get-categories",
+            "count": 63
+        },
+        {
+            "action": "topic:deliverect-crawler-request",
+            "count": 62
+        },
+        {
+            "action": "api:get:/ajax/order/unpaid",
+            "count": 60
+        },
+        {
+            "action": "api:get:/customer/payment-method/card/:cardPaymentMethodId",
+            "count": 60
+        },
+        {
+            "action": "api:put:/customer/payment-method/card/:cardPaymentMethodId/failed-payment-count",
+            "count": 60
+        },
+        {
+            "action": "api:put:/loyalty/point-event",
+            "count": 59
+        },
+        {
+            "action": "api:put:/ajax/order/:id/status",
+            "count": 58
+        },
+        {
+            "action": "api:put:/bo/location/:locationId/item-price/sales-channel/bulk-update",
+            "count": 58
+        },
+        {
+            "action": "api:post:/payment/one-time",
+            "count": 56
+        },
+        {
+            "action": "api:post:/session:task:save-account-device-history",
+            "count": 56
+        },
+        {
+            "action": "api:put:/bo/menu/:id",
+            "count": 56
+        },
+        {
+            "action": "api:post:/notification/verification-code",
+            "count": 55
+        },
+        {
+            "action": "api:put:/product-inventory-status",
+            "count": 54
+        },
+        {
+            "action": "api:get:/bo/loyalty/point-event/calculate",
+            "count": 53
+        },
+        {
+            "action": "api:get:/kiosk-app/welcome-screen",
+            "count": 53
+        },
+        {
+            "action": "api:get:/location/:id/kiosk-configuration",
+            "count": 52
+        },
+        {
+            "action": "api:post:/payment/saved-method:task:save-trasaction-square-payment-method-async",
+            "count": 52
+        },
+        {
+            "action": "api:put:/bo/location/:locationId/item-price/bulk-upsert",
+            "count": 52
+        },
+        {
+            "action": "api:get:/bo/printer/:id/setting",
+            "count": 50
+        },
+        {
+            "action": "api:post:/notification/order/accepted",
+            "count": 50
+        },
+        {
+            "action": "api:put:/bo/item",
+            "count": 48
+        },
+        {
+            "action": "api:get:/menu/:id",
+            "count": 47
+        },
+        {
+            "action": "api:put:/loyalty/point/estimated-earning",
+            "count": 47
+        },
+        {
+            "action": "api:delete:/product/:id/location/sales-channel/:salesChannel/price",
+            "count": 46
+        },
+        {
+            "action": "api:get:/ajax/square-sync/merchant",
+            "count": 46
+        },
+        {
+            "action": "api:get:/merchant/:posMerchantId",
+            "count": 45
+        },
+        {
+            "action": "api:put:/location/list-by-pos-location",
+            "count": 45
+        },
+        {
+            "action": "topic:deliverect-crawler-publish-menu-request:task:get-categories",
+            "count": 45
+        },
+        {
+            "action": "api:get:/ajax/cart:task:refresh-session-expired-time",
+            "count": 44
+        },
+        {
+            "action": "api:get:/payment/:paymentId",
+            "count": 44
+        },
+        {
+            "action": "api:post:/payment/:paymentId/refund",
+            "count": 44
+        },
+        {
+            "action": "api:put:/bo/user",
+            "count": 44
+        },
+        {
+            "action": "api:get:/bo/printer/:id",
+            "count": 43
+        },
+        {
+            "action": "api:put:/ajax/location/switch",
+            "count": 43
+        },
+        {
+            "action": "api:get:/category",
+            "count": 42
+        },
+        {
+            "action": "api:put:/bo/order/:id/preview-itemized-refund",
+            "count": 42
+        },
+        {
+            "action": "api:put:/loyalty/point-event/earned",
+            "count": 42
+        },
+        {
+            "action": "api:put:/ajax/menu/:id",
+            "count": 41
+        },
+        {
+            "action": "api:put:/ajax/merchant/user",
+            "count": 39
+        },
+        {
+            "action": "api:put:/ajax/session/refresh-location:task:refresh-session-expired-time",
+            "count": 39
+        },
+        {
+            "action": "topic:enable-location-special-instruction-setting",
+            "count": 39
+        },
+        {
+            "action": "api:get:/account",
+            "count": 38
+        },
+        {
+            "action": "api:post:/customer/login-history",
+            "count": 38
+        },
+        {
+            "action": "api:put:/location/status/batch",
+            "count": 37
+        },
+        {
+            "action": "api:get:/ajax/mobile-app",
+            "count": 36
+        },
+        {
+            "action": "api:get:/bo/mobile-app/:id",
+            "count": 36
+        },
+        {
+            "action": "api:post:/payment-method/attach",
+            "count": 36
+        },
+        {
+            "action": "api:put:/ajax/item/:id",
+            "count": 36
+        },
+        {
+            "action": "api:put:/bo/item/:id",
+            "count": 36
+        },
+        {
+            "action": "api:put:/product/:id/location/price",
+            "count": 36
+        },
+        {
+            "action": "api:get:/tax/count",
+            "count": 35
+        },
+        {
+            "action": "api:put:/ajax/report/order/hourly",
+            "count": 35
+        },
+        {
+            "action": "api:put:/bo/report/order/hourly",
+            "count": 35
+        },
+        {
+            "action": "api:put:/customer/check",
+            "count": 35
+        },
+        {
+            "action": "api:get:/ajax/merchant/payment-gateway",
+            "count": 34
+        },
+        {
+            "action": "api:get:/location/channel/store/:channelStoreId",
+            "count": 34
+        },
+        {
+            "action": "api:post:/loyalty/reward-tier/redeem",
+            "count": 34
+        },
+        {
+            "action": "api:put:/ajax/location/:locationId/channel-hour",
+            "count": 34
+        },
+        {
+            "action": "api:put:/bo/location/:id/channel-hour",
+            "count": 34
+        },
+        {
+            "action": "api:get:/ajax/pos/:platform/full-sync",
+            "count": 33
+        },
+        {
+            "action": "api:get:/ajax/tableside",
+            "count": 33
+        },
+        {
+            "action": "api:get:/merchant/:fbrMerchantId/pos/:platform/full-sync",
+            "count": 33
+        },
+        {
+            "action": "api:put:/bo/menu/location/batch",
+            "count": 33
+        },
+        {
+            "action": "api:put:/loyalty/point-event/deducted",
+            "count": 33
+        },
+        {
+            "action": "http:get:/ajax/location/:locationId/qr-code/preview",
+            "count": 33
+        },
+        {
+            "action": "http:post:/webhook/printer-status",
+            "count": 33
+        },
+        {
+            "action": "http:post:/webhook/printer-status:task:printer-status-webhook-alert-sync",
+            "count": 33
+        },
+        {
+            "action": "http:put:/merchant/mobile-app-build/build/:buildId",
+            "count": 33
+        },
+        {
+            "action": "api:get:/ajax/store/merchant:task:refresh-session-expired-time",
+            "count": 32
+        },
+        {
+            "action": "api:get:/bo/location/:id/qr-code/preview",
+            "count": 32
+        },
+        {
+            "action": "api:put:/alert",
+            "count": 32
+        },
+        {
+            "action": "api:get:/ajax/customer/profile:task:refresh-session-expired-time",
+            "count": 31
+        },
+        {
+            "action": "api:put:/ajax/customer/sms-verification-code/verify",
+            "count": 30
+        },
+        {
+            "action": "api:put:/order/check-customer/batch",
+            "count": 30
+        },
+        {
+            "action": "job:charge-invoice-job",
+            "count": 30
+        },
+        {
+            "action": "job:create-daily-invoice-job",
+            "count": 30
+        },
+        {
+            "action": "job:deliverect-refresh-location-job",
+            "count": 30
+        },
+        {
+            "action": "job:pos-refresh-token-job",
+            "count": 30
+        },
+        {
+            "action": "job:remove-expired-session-job",
+            "count": 30
+        },
+        {
+            "action": "topic:charge-invoice-request",
+            "count": 30
+        },
+        {
+            "action": "topic:create-daily-invoice-request",
+            "count": 30
+        },
+        {
+            "action": "topic:deliverect-refresh-location-request",
+            "count": 30
+        },
+        {
+            "action": "topic:pos-refresh-token-request",
+            "count": 30
+        },
+        {
+            "action": "topic:remove-expired-session-request",
+            "count": 30
+        },
+        {
+            "action": "topic:remove-expired-session-request:task:remove-expired-sessions-async",
+            "count": 30
+        },
+        {
+            "action": "api:get:/ajax/store/fulfillment",
+            "count": 29
+        },
+        {
+            "action": "api:put:/ajax/report/overview",
+            "count": 29
+        },
+        {
+            "action": "api:put:/bo/report/overview",
+            "count": 29
+        },
+        {
+            "action": "job:subscription-expiration-notice-job",
+            "count": 29
+        },
+        {
+            "action": "topic:subscription-expiration-notice-request-message",
+            "count": 29
+        },
+        {
+            "action": "api:put:/ajax/order/:id/preview-itemized-refund",
+            "count": 28
+        },
+        {
+            "action": "api:put:/product/:id/location/sales-channel/:salesChannel/price",
+            "count": 28
+        },
+        {
+            "action": "api:get:/file/download",
+            "count": 26
+        },
+        {
+            "action": "api:post:/ajax/customer/sms-verification-code",
+            "count": 26
+        },
+        {
+            "action": "api:post:/customer/payment-method/card",
+            "count": 26
+        },
+        {
+            "action": "api:post:/payment/one-time:task:save-trasaction-square-payment-method-async",
+            "count": 26
+        },
+        {
+            "action": "api:put:/ajax/cart-item",
+            "count": 26
+        },
+        {
+            "action": "api:put:/ajax/customer/logout",
+            "count": 26
+        },
+        {
+            "action": "api:put:/location/upsert",
+            "count": 26
+        },
+        {
+            "action": "api:put:/ajax/report/traffic",
+            "count": 25
+        },
+        {
+            "action": "api:put:/bo/report/traffic",
+            "count": 25
+        },
+        {
+            "action": "api:get:/ajax/printer/:id",
+            "count": 24
+        },
+        {
+            "action": "api:put:/ajax/media-library",
+            "count": 24
+        },
+        {
+            "action": "api:put:/bo/media-library",
+            "count": 24
+        },
+        {
+            "action": "api:delete:/bo/auth/token",
+            "count": 23
+        },
+        {
+            "action": "api:get:/ajax/location/info",
+            "count": 23
+        },
+        {
+            "action": "http:post:/merchant/:merchantId/mobile-app-build/task",
+            "count": 23
+        },
+        {
+            "action": "topic:action-log-v2",
+            "count": 23
+        },
+        {
+            "action": "api:get:/ajax/pos/:platform/pos-merchant",
+            "count": 22
+        },
+        {
+            "action": "api:get:/bo/menu/product",
+            "count": 22
+        },
+        {
+            "action": "api:get:/channel/merchant/pos/:posMerchantId",
+            "count": 22
+        },
+        {
+            "action": "api:get:/location/:id",
+            "count": 22
+        },
+        {
+            "action": "api:get:/order/get-latest-by-customer",
+            "count": 22
+        },
+        {
+            "action": "api:put:/mr-keke/location",
+            "count": 22
+        },
+        {
+            "action": "api:put:/order/:id/status",
+            "count": 22
+        },
+        {
+            "action": "http:post:/webhook/order-notification",
+            "count": 22
+        },
+        {
+            "action": "http:post:/webhook/order-notification:task:handle-order-notification",
+            "count": 22
+        },
+        {
+            "action": "topic:loyalty-point-event-created",
+            "count": 22
+        },
+        {
+            "action": "api:get:/menu",
+            "count": 21
+        },
+        {
+            "action": "api:put:/ajax/product:task:refresh-session-expired-time",
+            "count": 21
+        },
+        {
+            "action": "api:put:/ajax/report/customer/hourly",
+            "count": 21
+        },
+        {
+            "action": "api:put:/bo/report/customer/hourly",
+            "count": 21
+        },
+        {
+            "action": "api:put:/order/bulk-get",
+            "count": 21
+        },
+        {
+            "action": "topic:deliverect-crawler-request:task:add-items",
+            "count": 21
+        },
+        {
+            "action": "api:get:/bo/role",
+            "count": 20
+        },
+        {
+            "action": "api:get:/kiosk-app/checkout-configuration",
+            "count": 20
+        },
+        {
+            "action": "api:post:/payment",
+            "count": 20
+        },
+        {
+            "action": "api:put:/ajax/report/item-revenue-ranking",
+            "count": 20
+        },
+        {
+            "action": "api:put:/bo/report/item-revenue-ranking",
+            "count": 20
+        },
+        {
+            "action": "api:put:/location/switch",
+            "count": 20
+        },
+        {
+            "action": "topic:customer-upserted",
+            "count": 20
+        },
+        {
+            "action": "api:get:/printer/:id",
+            "count": 19
+        },
+        {
+            "action": "api:put:/customer/logout",
+            "count": 19
+        },
+        {
+            "action": "http:post:/webhook/store-status",
+            "count": 19
+        },
+        {
+            "action": "api:get:/loyalty/rule",
+            "count": 18
+        },
+        {
+            "action": "api:post:/customer/register",
+            "count": 18
+        },
+        {
+            "action": "api:post:/notification/order/ready",
+            "count": 18
+        },
+        {
+            "action": "api:put:/ajax/cart-item/:id/quantity",
+            "count": 18
+        },
+        {
+            "action": "api:put:/guest/batch-delete",
+            "count": 18
+        },
+        {
+            "action": "api:put:/user/auth",
+            "count": 18
+        },
+        {
+            "action": "topic:batch-tax-upserted",
+            "count": 18
+        },
+        {
+            "action": "api:post:/ajax/item",
+            "count": 17
+        },
+        {
+            "action": "api:post:/bo/item",
+            "count": 17
+        },
+        {
+            "action": "api:post:/bo/printer/:id/register",
+            "count": 17
+        },
+        {
+            "action": "api:put:/ajax/product/list",
+            "count": 17
+        },
+        {
+            "action": "api:put:/bo/menu/modifier",
+            "count": 17
+        },
+        {
+            "action": "api:put:/bo/order/:id/cancel",
+            "count": 17
+        },
+        {
+            "action": "api:put:/bo/order/:id/preview-custom-refund",
+            "count": 17
+        },
+        {
+            "action": "api:put:/bo/product/list",
+            "count": 17
+        },
+        {
+            "action": "api:get:/ajax/location/:locationId/qr-code-configuration",
+            "count": 16
+        },
+        {
+            "action": "api:get:/bo/location/:id/qr-code-configuration",
+            "count": 16
+        },
+        {
+            "action": "api:post:/bo/print-job/test",
+            "count": 16
+        },
+        {
+            "action": "api:post:/merchant/:posMerchantId/location/:posLocationId/order",
+            "count": 16
+        },
+        {
+            "action": "api:put:/ajax/location/:locationId/product",
+            "count": 16
+        },
+        {
+            "action": "api:put:/ajax/location/:locationId/tax",
+            "count": 16
+        },
+        {
+            "action": "api:put:/bo/location/:locationId/item-tax/bulk-upsert",
+            "count": 16
+        },
+        {
+            "action": "api:put:/bo/tax/location/bulk",
+            "count": 16
+        },
+        {
+            "action": "api:put:/customer/sms-verification-code/verify:task:save-account-device-history",
+            "count": 16
+        },
+        {
+            "action": "api:put:/product/merchant",
+            "count": 16
+        },
+        {
+            "action": "api:put:/user/logout",
+            "count": 16
+        },
+        {
+            "action": "topic:pos-integrator-order-notification",
+            "count": 16
+        },
+        {
+            "action": "api:post:/ajax/customer/register",
+            "count": 15
+        },
+        {
+            "action": "api:put:/ajax/customer",
+            "count": 15
+        },
+        {
+            "action": "api:put:/bo/customer",
+            "count": 15
+        },
+        {
+            "action": "api:put:/menu/:id",
+            "count": 15
+        },
+        {
+            "action": "api:get:/product/popular-searches",
+            "count": 14
+        },
+        {
+            "action": "api:put:/ajax/alert/:id/mark-as-resolved",
+            "count": 14
+        },
+        {
+            "action": "api:put:/ajax/order/:id/cancel",
+            "count": 14
+        },
+        {
+            "action": "api:put:/ajax/report/order/daily",
+            "count": 14
+        },
+        {
+            "action": "api:put:/bo/report/order/daily",
+            "count": 14
+        },
+        {
+            "action": "api:put:/item/list",
+            "count": 14
+        },
+        {
+            "action": "api:put:/menu/section",
+            "count": 14
+        },
+        {
+            "action": "api:put:/order/:id/preview-itemized-refund",
+            "count": 14
+        },
+        {
+            "action": "api:delete:/cart-item/:id",
+            "count": 13
+        },
+        {
+            "action": "api:get:/ajax/printer/:id/setting",
+            "count": 13
+        },
+        {
+            "action": "api:get:/ajax/printer/:id/setting/category",
+            "count": 13
+        },
+        {
+            "action": "api:get:/ajax/printer/:id/setting/product",
+            "count": 13
+        },
+        {
+            "action": "api:get:/ajax/report/customer/overall-count",
+            "count": 13
+        },
+        {
+            "action": "api:get:/ajax/tax/:id",
+            "count": 13
+        },
+        {
+            "action": "api:get:/bo/tax/:id",
+            "count": 13
+        },
+        {
+            "action": "api:get:/user/permissions",
+            "count": 13
+        },
+        {
+            "action": "api:get:/user/tenants",
+            "count": 13
+        },
+        {
+            "action": "api:post:/customer/register:task:customer-phone-history-async",
+            "count": 13
+        },
+        {
+            "action": "api:post:/customer/register:task:customer-setting-async",
+            "count": 13
+        },
+        {
+            "action": "api:put:/ajax/order/:id/preview-custom-refund",
+            "count": 13
+        },
+        {
+            "action": "api:put:/bo/report/customer/overall-count",
+            "count": 13
+        },
+        {
+            "action": "api:put:/location/inventory/modifiers",
+            "count": 13
+        },
+        {
+            "action": "api:put:/location/list-by-merchants",
+            "count": 13
+        },
+        {
+            "action": "api:put:/order/:id/pos-order",
+            "count": 13
+        },
+        {
+            "action": "api:put:/user/login",
+            "count": 13
+        },
+        {
+            "action": "api:get:/alert/:id",
+            "count": 12
+        },
+        {
+            "action": "api:get:/cart-item/:id",
+            "count": 12
+        },
+        {
+            "action": "api:post:/ajax/user/logout",
+            "count": 12
+        },
+        {
+            "action": "api:put:/ajax/location/:locationId/setting",
+            "count": 12
+        },
+        {
+            "action": "api:put:/bo/location/:id/setting",
+            "count": 12
+        },
+        {
+            "action": "api:put:/bo/location/:id/temp-close",
+            "count": 12
+        },
+        {
+            "action": "api:put:/location/inventory/product-status",
+            "count": 12
+        },
+        {
+            "action": "topic:deliverect-crawler-publish-menu-request:task:add-items",
+            "count": 12
+        },
+        {
+            "action": "api:get:/bo/location/:id/qr-code",
+            "count": 11
+        },
+        {
+            "action": "api:get:/printer/:id/setting",
+            "count": 11
+        },
+        {
+            "action": "http:get:/ajax/location/:locationId/qr-code",
+            "count": 11
+        },
+        {
+            "action": "api:get:/bo/tenant/:id",
+            "count": 10
+        },
+        {
+            "action": "api:get:/bo/v2/user/:id",
+            "count": 10
+        },
+        {
+            "action": "api:get:/loyalty/account/:id",
+            "count": 10
+        },
+        {
+            "action": "api:get:/printer/order-receipt",
+            "count": 10
+        },
+        {
+            "action": "api:post:/ajax/customer/payment-method/card",
+            "count": 10
+        },
+        {
+            "action": "api:post:/ajax/printer/:id/register",
+            "count": 10
+        },
+        {
+            "action": "api:post:/payment-method/attach:task:track-stripe-api",
+            "count": 10
+        },
+        {
+            "action": "api:put:/ajax/report/order/monthly",
+            "count": 10
+        },
+        {
+            "action": "api:put:/bo/report/order/monthly",
+            "count": 10
+        },
+        {
+            "action": "api:put:/order/:orderId/mark-as-paid",
+            "count": 10
+        },
+        {
+            "action": "http:post:/webhook/print-order-status",
+            "count": 10
+        },
+        {
+            "action": "topic:pos-loyalty-account-phone-updated",
+            "count": 10
+        },
+        {
+            "action": "api:get:/ajax/customer/address",
+            "count": 9
+        },
+        {
+            "action": "api:get:/ajax/kiosk-app",
+            "count": 9
+        },
+        {
+            "action": "api:get:/ajax/merchant/access",
+            "count": 9
+        },
+        {
+            "action": "api:get:/ajax/merchant/user/:id",
+            "count": 9
+        },
+        {
+            "action": "api:get:/ajax/modifier/:id",
+            "count": 9
+        },
+        {
+            "action": "api:get:/bo/kiosk-app/:id",
+            "count": 9
+        },
+        {
+            "action": "api:get:/bo/modifier/:id",
+            "count": 9
+        },
+        {
+            "action": "api:post:/customer/:id/payment-method/default",
+            "count": 9
+        },
+        {
+            "action": "api:post:/payment/saved-method:task:save-transaction-stripe-payment-method-async",
+            "count": 9
+        },
+        {
+            "action": "api:post:/payment/saved-method:task:track-stripe-api",
+            "count": 9
+        },
+        {
+            "action": "api:post:/printer/:id/test",
+            "count": 9
+        },
+        {
+            "action": "api:put:/ajax/customer/payment-method",
+            "count": 9
+        },
+        {
+            "action": "api:put:/ajax/report/order/weekly",
+            "count": 9
+        },
+        {
+            "action": "api:put:/bo/location/:id/cancel-temp-close",
+            "count": 9
+        },
+        {
+            "action": "api:put:/bo/report/order/weekly",
+            "count": 9
+        },
+        {
+            "action": "api:put:/location/temp-close",
+            "count": 9
+        },
+        {
+            "action": "api:put:/order/:id",
+            "count": 9
+        },
+        {
+            "action": "topic:product-media-upsert",
+            "count": 9
+        },
+        {
+            "action": "api:get:/ajax/tenant",
+            "count": 8
+        },
+        {
+            "action": "api:get:/order/:posOrderId",
+            "count": 8
+        },
+        {
+            "action": "api:post:/bo/order/:id/itemized-refund",
+            "count": 8
+        },
+        {
+            "action": "api:post:/bo/print-job/batch",
+            "count": 8
+        },
+        {
+            "action": "api:post:/notification/order/canceled",
+            "count": 8
+        },
+        {
+            "action": "api:put:/ajax/report/customer/daily",
+            "count": 8
+        },
+        {
+            "action": "api:put:/bo/location/:id/sales-channel/status",
+            "count": 8
+        },
+        {
+            "action": "api:put:/bo/location/:locationId/item-price/sales-channel/status",
+            "count": 8
+        },
+        {
+            "action": "api:put:/bo/location/:locationId/item-tax/sales-channel/status",
+            "count": 8
+        },
+        {
+            "action": "api:put:/bo/merchant/:fbrMerchantId/location/:fbrLocationId/channel/:platform/store/:storeId/association_status",
+            "count": 8
+        },
+        {
+            "action": "api:put:/bo/report/customer/daily",
+            "count": 8
+        },
+        {
+            "action": "api:put:/bo/tax/location/sales-channel/status",
+            "count": 8
+        },
+        {
+            "action": "api:put:/cart/merge",
+            "count": 8
+        },
+        {
+            "action": "api:put:/customer-setting",
+            "count": 8
+        },
+        {
+            "action": "api:put:/customer-setting/:customerId",
+            "count": 8
+        },
+        {
+            "action": "api:put:/order/:id/cancel",
+            "count": 8
+        },
+        {
+            "action": "api:get:/location/prints",
+            "count": 7
+        },
+        {
+            "action": "api:get:/merchant/:posMerchantId/loyalty/account",
+            "count": 7
+        },
+        {
+            "action": "api:post:/ajax/order/:id/itemized-refund",
+            "count": 7
+        },
+        {
+            "action": "api:post:/ajax/order/:id/print",
+            "count": 7
+        },
+        {
+            "action": "api:post:/ajax/printer/:id/test-print",
+            "count": 7
+        },
+        {
+            "action": "api:post:/printer/:id/register",
+            "count": 7
+        },
+        {
+            "action": "api:put:/ajax/channel/:platform/store/:storeId/association-status",
+            "count": 7
+        },
+        {
+            "action": "api:put:/ajax/location/:locationId/sales-channel/product",
+            "count": 7
+        },
+        {
+            "action": "api:put:/ajax/location/:locationId/sales-channel/tax",
+            "count": 7
+        },
+        {
+            "action": "api:put:/ajax/map/address",
+            "count": 7
+        },
+        {
+            "action": "api:put:/ajax/order/:id/mark-as-paid",
+            "count": 7
+        },
+        {
+            "action": "api:put:/ajax/order/unpaid/append-item",
+            "count": 7
+        },
+        {
+            "action": "api:put:/bo/order/:id/mark-as-paid",
+            "count": 7
+        },
+        {
+            "action": "api:put:/bo/tax/location/sales-channel/bulk",
+            "count": 7
+        },
+        {
+            "action": "topic:deliverect-crawler-request:task:sort-items",
+            "count": 7
+        },
+        {
+            "action": "topic:order-notification:task:loyalty-async",
+            "count": 7
+        },
+        {
+            "action": "api:delete:/ajax/tax/:id",
+            "count": 6
+        },
+        {
+            "action": "api:delete:/bo/tax/:id",
+            "count": 6
+        },
+        {
+            "action": "api:delete:/location/setting/item/:itemId",
+            "count": 6
+        },
+        {
+            "action": "api:delete:/loyalty/reward-tier/applied",
+            "count": 6
+        },
+        {
+            "action": "api:get:/ajax/order/:id:task:refresh-session-expired-time",
+            "count": 6
+        },
+        {
+            "action": "api:get:/ajax/square-sync/full-sync",
+            "count": 6
+        },
+        {
+            "action": "api:get:/channel/merchant/:fbrMerchantId/full-sync",
+            "count": 6
+        },
+        {
+            "action": "api:post:/ajax/cart-item/add-order-all-item",
+            "count": 6
+        },
+        {
+            "action": "api:post:/ajax/location/:locationId/full-sync",
+            "count": 6
+        },
+        {
+            "action": "api:post:/bo/merchant/:fbrMerchantId/location/:fbrLocationId/full-sync",
+            "count": 6
+        },
+        {
+            "action": "api:put:/ajax/checkout/fulfillment-type",
+            "count": 6
+        },
+        {
+            "action": "api:put:/ajax/customer/phone/check",
+            "count": 6
+        },
+        {
+            "action": "api:put:/ajax/loyalty-program/reward-tier",
+            "count": 6
+        },
+        {
+            "action": "api:put:/ajax/pos/:platform/full-sync",
+            "count": 6
+        },
+        {
+            "action": "api:put:/ajax/report/tenant/hourly",
+            "count": 6
+        }
+    ]
+}
