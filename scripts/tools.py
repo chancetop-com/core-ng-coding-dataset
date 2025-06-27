@@ -75,6 +75,21 @@ def merge_wiki_to_jsonl(wiki_qa_path: str = "../train-wiki.jsonl", original_qa_p
     print(f"Merged {wiki_count} wiki QA entries and {original_count} original QA entries into {output_qa_path}")
 
 
+CORE_NG_CODING_SYSTEM_PROMPT = """You are a helpful coding assistant. Your task is to assist with coding-related questions and tasks. Please provide clear and concise answers, and if necessary, write code snippets in a format that is easy to understand and execute."""
+
+def change_text_generation_format_to_chat_completion_format(input_path: str, output_path: str, system_prompt: str = CORE_NG_CODING_SYSTEM_PROMPT) -> None:
+    data = []
+    with open(input_path, 'r', encoding='utf-8') as input_file:
+        lines = input_file.readlines()
+        for line in lines:
+            j = json.loads(line)
+            chat = {"messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": j["prompt"]}, {"role": "assistant", "content": j["completion"]}]}
+            data.append(chat)
+    with open(output_path, 'w', encoding='utf-8') as output_file:
+        for entry in data:
+            output_file.write(json.dumps(entry, ensure_ascii=False) + '\n')
+
+
 if __name__ == "__main__":
     fire.Fire({
         "repo": parse_repo,
@@ -83,5 +98,6 @@ if __name__ == "__main__":
         "trace": trace,
         "recent": fetch_recent_traces,
         "merge": merge_library_and_example_qa_result,
-        "mergev2": merge_wiki_to_jsonl
+        "mergev2": merge_wiki_to_jsonl,
+        "change_format": change_text_generation_format_to_chat_completion_format
     })
